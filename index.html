@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kochava & Mobile Tracking Academy</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3250;
+    --primary: #4f8ef7;
+    --primary-glow: rgba(79,142,247,0.15);
+    --green: #3ecf8e;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e8eaf0;
+    --muted: #8b90a7;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #0f1117 0%, #1a1d2f 100%); border-bottom: 1px solid var(--border); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { font-size: 28px; }
+  .logo-text h1 { font-size: 20px; font-weight: 700; }
+  .logo-text p { font-size: 12px; color: var(--muted); }
+  .header-stats { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .stat-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; color: var(--muted); }
+  .stat-pill span { color: var(--primary); font-weight: 600; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .hero { text-align: center; padding: 48px 24px 40px; max-width: 800px; margin: 0 auto 40px; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--primary-glow); border: 1px solid rgba(79,142,247,0.3); border-radius: 20px; padding: 6px 16px; font-size: 13px; color: var(--primary); margin-bottom: 20px; }
+  .hero h2 { font-size: clamp(28px,5vw,44px); font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg,#fff 30%,var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .hero p { font-size: 17px; color: var(--muted); max-width: 560px; margin: 0 auto 28px; }
+  .progress-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 40px; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .progress-header h3 { font-size: 15px; font-weight: 600; }
+  .progress-pct { font-size: 24px; font-weight: 800; color: var(--primary); }
+  .progress-bar-track { height: 10px; background: var(--surface2); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--primary),var(--green)); border-radius: 10px; transition: width 0.6s ease; }
+  .level-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+  .level-badge { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid; }
+  .level-badge.locked { background: var(--surface2); border-color: var(--border); color: var(--muted); }
+  .level-badge.active { background: rgba(79,142,247,0.15); border-color: var(--primary); color: var(--primary); }
+  .level-badge.done { background: rgba(62,207,142,0.15); border-color: var(--green); color: var(--green); }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .section-header h3 { font-size: 18px; font-weight: 700; }
+  .section-tag { padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  .tag-beginner { background: rgba(62,207,142,0.15); color: var(--green); }
+  .tag-intermediate { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .tag-advanced { background: rgba(239,68,68,0.15); color: var(--red); }
+  .tag-expert { background: rgba(79,142,247,0.15); color: var(--primary); }
+  .modules-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(340px,1fr)); gap: 16px; margin-bottom: 48px; }
+  .module-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s,transform 0.2s,box-shadow 0.2s; cursor: pointer; }
+  .module-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(79,142,247,0.1); }
+  .module-card.completed { border-color: rgba(62,207,142,0.4); }
+  .module-card.completed:hover { border-color: var(--green); }
+  .module-card-header { padding: 18px 20px 14px; display: flex; align-items: flex-start; gap: 14px; }
+  .module-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .icon-green { background: rgba(62,207,142,0.15); }
+  .icon-yellow { background: rgba(245,158,11,0.15); }
+  .icon-red { background: rgba(239,68,68,0.15); }
+  .icon-blue { background: rgba(79,142,247,0.15); }
+  .module-meta h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .module-meta p { font-size: 13px; color: var(--muted); line-height: 1.4; }
+  .module-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .module-stats { display: flex; gap: 14px; }
+  .module-stat { font-size: 12px; color: var(--muted); }
+  .module-stat strong { color: var(--text); }
+  .module-action { font-size: 12px; font-weight: 600; color: var(--primary); }
+  .module-action.done { color: var(--green); }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 200; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow-y: auto; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 780px; position: relative; animation: slideUp 0.25s ease; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .modal-header { padding: 28px 28px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 16px; align-items: flex-start; }
+  .modal-header-text h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .modal-header-text p { color: var(--muted); font-size: 14px; }
+  .modal-close { position: absolute; top: 20px; right: 20px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); width: 32px; height: 32px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 28px; max-height: 70vh; overflow-y: auto; }
+  .lesson-section { margin-bottom: 28px; }
+  .lesson-section h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--primary); margin-bottom: 14px; }
+  .lesson-section p { color: var(--muted); font-size: 14px; line-height: 1.75; margin-bottom: 10px; }
+  .lesson-section strong { color: var(--text); }
+  .concept-list { list-style: none; }
+  .concept-list li { padding: 10px 14px; background: var(--surface2); border-radius: 8px; margin-bottom: 8px; font-size: 14px; border-left: 3px solid var(--border); color: var(--text); line-height: 1.5; }
+  .concept-list li.highlight { border-left-color: var(--primary); }
+  .concept-list li strong { color: var(--primary); }
+  .code-block { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-family: 'Courier New',monospace; font-size: 13px; color: #a8d8a8; overflow-x: auto; margin-bottom: 10px; line-height: 1.7; white-space: pre; }
+  .tip-box { background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.25); border-radius: 8px; padding: 14px 16px; font-size: 14px; color: var(--text); margin-bottom: 10px; line-height: 1.65; }
+  .tip-box .tip-label { color: var(--primary); font-weight: 700; margin-bottom: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .warning-box { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 14px 16px; font-size: 14px; color: var(--text); margin-bottom: 10px; line-height: 1.65; }
+  .warning-box .warn-label { color: var(--yellow); font-weight: 700; margin-bottom: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .quiz-section { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
+  .quiz-progress { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .quiz-progress span { color: var(--primary); font-weight: 700; }
+  .quiz-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  .quiz-question { font-size: 15px; color: var(--text); margin-bottom: 14px; font-weight: 600; line-height: 1.5; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .quiz-option { padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--text); transition: all 0.2s; text-align: left; line-height: 1.4; }
+  .quiz-option:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-glow); }
+  .quiz-option.correct { background: rgba(62,207,142,0.15); border-color: var(--green); color: var(--green); }
+  .quiz-option.wrong { background: rgba(239,68,68,0.1); border-color: var(--red); color: var(--red); }
+  .quiz-feedback { font-size: 14px; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: none; line-height: 1.6; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { background: rgba(62,207,142,0.1); color: #5ae8a8; border: 1px solid rgba(62,207,142,0.3); }
+  .quiz-feedback.wrong-fb { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .quiz-score { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 16px; display: none; }
+  .quiz-score.show { display: block; }
+  .quiz-score-num { font-size: 32px; font-weight: 800; color: var(--primary); }
+  .quiz-score-label { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .modal-footer { padding: 20px 28px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .btn { padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: #6fa3f9; }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-complete { background: var(--green); color: #0f1117; }
+  .btn-complete:hover { background: #5adeab; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-next { background: var(--primary); color: #fff; display: none; }
+  .btn-next.show { display: inline-block; }
+  .glossary-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 12px; margin-bottom: 48px; }
+  .glossary-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .glossary-term { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+  .glossary-def { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .cheatsheet { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 48px; }
+  .cheatsheet h3 { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+  .cheat-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 12px; }
+  .cheat-item { background: var(--surface2); border-radius: 8px; padding: 14px; }
+  .cheat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .cheat-value { font-size: 13px; color: var(--text); font-weight: 600; }
+  .cheat-note { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+  footer a { color: var(--primary); text-decoration: none; }
+  @media(max-width:640px){ header{padding:16px;flex-direction:column;gap:12px;align-items:flex-start} .modules-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">📡</div>
+    <div class="logo-text">
+      <h1>Kochava & Mobile Tracking Academy</h1>
+      <p>From PPC Pro → Mobile Measurement Expert</p>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill">Modules: <span id="hdr-done">0</span>/<span id="hdr-total">0</span></div>
+    <div class="stat-pill">Level: <span id="hdr-level">Beginner</span></div>
+    <button class="btn btn-secondary" onclick="resetProgress()" style="font-size:12px;padding:6px 12px;">Reset Progress</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">🎯 Built for PPC Professionals</div>
+    <h2>Master Mobile App Tracking & Measurement</h2>
+    <p>You already speak the language of performance marketing. This curriculum fills the mobile gap — attribution, SDKs, fraud, incrementality, and beyond.</p>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-header">
+      <h3>Your Progress</h3>
+      <div class="progress-pct" id="prog-pct">0%</div>
+    </div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+    <div class="level-badges">
+      <div class="level-badge" id="badge-beginner">🟢 Beginner (1–4)</div>
+      <div class="level-badge locked" id="badge-intermediate">🟡 Intermediate (5–8)</div>
+      <div class="level-badge locked" id="badge-advanced">🔴 Advanced (9–11)</div>
+      <div class="level-badge locked" id="badge-expert">🔵 Expert (12–13)</div>
+    </div>
+  </div>
+
+  <div class="section-header"><h3>Beginner</h3><span class="section-tag tag-beginner">Foundation</span></div>
+  <div class="modules-grid" id="grid-beginner"></div>
+
+  <div class="section-header"><h3>Intermediate</h3><span class="section-tag tag-intermediate">Core Skills</span></div>
+  <div class="modules-grid" id="grid-intermediate"></div>
+
+  <div class="section-header"><h3>Advanced</h3><span class="section-tag tag-advanced">Deep Dive</span></div>
+  <div class="modules-grid" id="grid-advanced"></div>
+
+  <div class="section-header"><h3>Expert</h3><span class="section-tag tag-expert">Mastery</span></div>
+  <div class="modules-grid" id="grid-expert"></div>
+
+  <div class="section-header" style="margin-top:8px;"><h3>Quick Reference Glossary</h3></div>
+  <div class="glossary-grid" id="glossary"></div>
+
+  <div class="cheatsheet">
+    <h3>📋 Kochava Setup Cheatsheet</h3>
+    <div class="cheat-grid" id="cheatsheet"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="modal-inner">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-header" id="modal-header"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<footer>
+  <p>Kochava Academy · Built for PPC professionals bridging into mobile measurement · <a href="https://support.kochava.com" target="_blank">Kochava Docs ↗</a> · <a href="https://support.kochava.com/sdk-integration/" target="_blank">SDK Reference ↗</a></p>
+</footer>
+
+<script>
+const MODULES = [
+  // ══════════════════════════════
+  //  BEGINNER
+  // ══════════════════════════════
+  {
+    id:1, level:'beginner', icon:'🗺️', iconClass:'icon-green',
+    title:'Mobile Attribution: The Big Picture',
+    desc:'Why last-click fails in mobile and what an MMP actually solves.',
+    lessons:10, mins:25,
+    content:{
+      overview:`Mobile attribution is the practice of connecting an app install — or any in-app action — back to the marketing touchpoint that drove it. As a PPC expert, you already understand attribution conceptually: user sees ad → user converts → platform takes credit. But mobile operates under entirely different infrastructure, identifiers, and platform rules. This module bridges your existing PPC knowledge to the mobile world and explains why a neutral third party (the MMP) is essential.`,
+      sections:[
+        {
+          heading:'Why Web Attribution Doesn\'t Transfer to Mobile',
+          body:`In web PPC, cookies and UTM parameters create a continuous data trail from click to conversion. Mobile apps destroy this trail at two points: the app store (a black box that breaks the referral chain) and the app itself (a sandboxed environment where apps can't read each other's data). This is why your web attribution skills don't fully transfer, and why a specialized mobile solution is needed.`,
+          items:[
+            {text:'<strong>No third-party cookies in apps</strong> — each app is an isolated sandbox. A click in a mobile browser can't be tracked into the App Store and then into the app install the way a cookie tracks across websites.',highlight:true},
+            {text:'<strong>The App Store gap</strong> — when a user taps an ad and is redirected to the App Store, the web session ends. The install happens later, sometimes days later, in a completely separate context.'},
+            {text:'<strong>Two platforms, two rule sets</strong> — iOS uses ATT/SKAN with privacy-first constraints; Android still uses GAID but is moving toward Privacy Sandbox. You can\'t treat them the same.'},
+            {text:'<strong>Install ≠ meaningful conversion</strong> — in web PPC, a conversion is usually the end goal. In mobile, the install is just the beginning. Revenue comes from in-app events: subscriptions, purchases, renewals.'},
+          ]
+        },
+        {
+          heading:'The MMP Ecosystem',
+          body:`A Mobile Measurement Partner (MMP) is a neutral third-party attribution platform that sits between your ad networks and your app. The big three are Kochava, AppsFlyer, and Adjust. All major ad networks (Meta, Google, TikTok, Apple) are certified with these MMPs, meaning they officially recognize their attribution data.`,
+          items:[
+            {text:'<strong>Why neutral matters:</strong> Without an MMP, you\'d have to trust each ad network\'s own reporting — but every network has financial incentive to claim credit for your installs. Self-attribution leads to double/triple counting.',highlight:true},
+            {text:'<strong>Kochava\'s role:</strong> Receives click and impression data from all networks, matches installs to the correct source using device IDs or probabilistic methods, and distributes attribution credit using last-click logic (or any model you configure).'},
+            {text:'<strong>Kochava vs AppsFlyer vs Adjust:</strong> All three are solid. Kochava tends to be preferred by mid-market to enterprise, with strong fraud tooling (ProtectIQ) and flexible reporting. AppsFlyer has a larger market share and strong self-serve UX. Adjust is popular in gaming and Europe.'},
+          ]
+        },
+        {
+          heading:'The Full Attribution Flow',
+          body:`Understanding the end-to-end flow is essential before you configure anything. Here's what happens on every attributed install:`,
+          items:[
+            {text:'<strong>Step 1:</strong> Ad network shows ad → records impression or click with its own click ID'},
+            {text:'<strong>Step 2:</strong> User taps ad → redirected through Kochava tracker URL → Kochava records the click + device ID',highlight:true},
+            {text:'<strong>Step 3:</strong> User goes to App Store → downloads and installs app'},
+            {text:'<strong>Step 4:</strong> App opens → Kochava SDK fires install event with device ID'},
+            {text:'<strong>Step 5:</strong> Kochava matches install device ID to earlier click → attributes to network',highlight:true},
+            {text:'<strong>Step 6:</strong> Kochava sends postback to network: "This install belongs to click ID [XYZ]"'},
+            {text:'<strong>Step 7:</strong> Network updates dashboard + uses signal for bidding optimization'},
+          ]
+        },
+        {
+          heading:'Key Insight for PPC Professionals',
+          body:`In web PPC, the ad platform (Google, Meta) does attribution themselves using their pixels and cookies, then reports back to you. You trust their data because you've installed their pixel. In mobile, there's no universal pixel. The Kochava SDK is your measurement layer across all networks — and Kochava is the single source of truth that no individual network can manipulate.`,
+          tip:{label:'💡 PPC Parallel',text:'Think of the Kochava tracker link as your UTM-tagged URL. The Kochava SDK is your measurement pixel. And Kochava\'s dashboard is your GA4 — but with cross-network attribution built in. The key difference: Kochava actively tells each network who gets credit, rather than each network claiming credit themselves.'}
+        }
+      ],
+      quizzes:[
+        {
+          question:'A user sees a Meta ad for GolfPass, taps it, goes to the App Store, downloads the app 2 days later, and opens it. Who attributes this install?',
+          options:['Meta, because the user clicked their ad','The App Store, because it facilitated the download','Kochava (the MMP), by matching the install device ID to the click record it saved 2 days ago','Google Analytics, using the mobile SDK'],
+          correct:2,
+          explanation:'Correct! Kochava stores the click record (including device ID and Meta\'s click ID) at click-time. When the install fires 2 days later, Kochava matches it to that saved record and attributes it to Meta — then sends Meta a postback confirming the install.'
+        },
+        {
+          question:'Why can\'t you just trust Meta\'s own app install reporting without an MMP?',
+          options:['Meta\'s reporting is always inaccurate','Meta has financial incentive to claim credit for installs that other channels (or organic) actually drove — an MMP provides neutral, third-party validation','Meta doesn\'t support app install campaigns','MMPs are required by law for app tracking'],
+          correct:1,
+          explanation:'Correct! Every ad network self-attributes, meaning they claim credit for installs using their own models. Without a neutral MMP, Meta, Google, and TikTok could each claim the same install — inflating your reported performance significantly. Kochava enforces last-click (or chosen model) attribution across ALL networks simultaneously.'
+        },
+        {
+          question:'What happens at the "App Store gap" that makes mobile attribution harder than web attribution?',
+          options:['The App Store charges a fee for attribution data','The user\'s session and referral data is lost when they leave the app to the App Store, breaking the web tracking chain','The App Store blocks all marketing pixels','Mobile browsers don\'t support cookies at all'],
+          correct:1,
+          explanation:'Correct! When a user taps a mobile ad and is redirected to the App Store, the browser session effectively ends. Any cookie or referral data from the ad click cannot persist through the App Store to the app install. MMPs solve this by saving click data server-side and matching it to the install via device ID when the app first opens.'
+        }
+      ]
+    }
+  },
+  {
+    id:2, level:'beginner', icon:'🔧', iconClass:'icon-green',
+    title:'How Kochava Works: Core Architecture',
+    desc:'Accounts, apps, SDKs, trackers, and postbacks — the fundamental building blocks.',
+    lessons:12, mins:28,
+    content:{
+      overview:`Before you configure a single campaign, you need to understand how Kochava is structured. A mis-configured Kochava setup is one of the most common causes of attribution discrepancies, missing data, and support tickets. This module walks through every core object in Kochava and how they connect to each other.`,
+      sections:[
+        {
+          heading:'Kochava Account Hierarchy',
+          body:`Kochava organizes everything in a strict hierarchy. Understanding this prevents confusion when setting up campaigns across multiple apps and platforms.`,
+          items:[
+            {text:'<strong>Account</strong> → top level. One per company. Holds all apps, users, and billing.',highlight:true},
+            {text:'<strong>App</strong> → one per app AND per platform. GolfPass iOS and GolfPass Android are TWO separate apps in Kochava. Critical — this is a common beginner mistake.'},
+            {text:'<strong>Tracker</strong> → one per campaign/network. This is your campaign-level tracking link.'},
+            {text:'<strong>Event</strong> → a defined in-app action (purchase, subscribe, register, etc.) that the SDK fires.',highlight:true},
+            {text:'<strong>Postback</strong> → outbound server-to-server signal from Kochava to an ad network when an event fires.'},
+            {text:'<strong>User Roles:</strong> Admin, Campaign Manager, Reporting Only — assign team members appropriately.'},
+          ]
+        },
+        {
+          heading:'The Kochava SDK: Your Data Pipeline',
+          body:`The SDK (Software Development Kit) is a small code library embedded by your app developers into the iOS and Android app. Without it, Kochava is blind to everything that happens after the ad click. It must be correctly implemented before you launch any campaigns.`,
+          items:[
+            {text:'<strong>What the SDK automatically tracks:</strong> Install (first open), App Open (each session), App Update events',highlight:true},
+            {text:'<strong>What the SDK tracks when coded:</strong> Any custom event your developer defines — purchase, subscribe, registration, tutorial_complete, etc.'},
+            {text:'<strong>iOS SDK requirements:</strong> Must implement ATT permission request. IDFA only available after user grants permission.'},
+            {text:'<strong>Android SDK requirements:</strong> Accesses GAID automatically. User can opt out in device settings.'},
+            {text:'<strong>SDK initialization:</strong> Must be called on every app open, not just install. This is what enables session tracking and re-engagement attribution.',highlight:true},
+          ]
+        },
+        {
+          heading:'Tracker Links: Your Mobile UTMs',
+          body:`Every campaign on every network needs its own Kochava tracker link. Think of it as a UTM-tagged landing page URL — but for mobile. The tracker encodes your campaign metadata and captures device IDs from ad network macros.`,
+          code:`// Kochava Tracker Link Anatomy
+https://control.kochava.com/v1/cpi/click
+  ?campaign_id=YOUR_CAMPAIGN_ID       ← Kochava assigns this
+  &network_id=NETWORK_ID              ← the ad network
+  &site_id={site_id}                  ← publisher/placement macro
+  &creative_id={creative_id}          ← creative macro
+  &device_id={idfa}                   ← iOS: Apple's IDFA macro
+  &device_id={gaid}                   ← Android: Google's GAID macro
+  &click_id={network_click_id}        ← network's own click ID`,
+          tip:{label:'🔑 Critical',text:'The device_id macro must match the platform. For iOS trackers use {idfa}. For Android use {gaid} or {adid}. Each ad network has its own macro syntax — always verify in that network\'s macro documentation, not from memory.'}
+        },
+        {
+          heading:'The Kochava Dashboard: Where to Find Things',
+          items:[
+            {text:'<strong>Apps & Assets → Apps:</strong> Create and manage your iOS/Android app objects',highlight:true},
+            {text:'<strong>Apps & Assets → Trackers:</strong> Create and manage all tracker links'},
+            {text:'<strong>Apps & Assets → Events:</strong> Define your event taxonomy'},
+            {text:'<strong>Partner Configuration:</strong> Set up integrations with each ad network and configure postbacks'},
+            {text:'<strong>Reports → Standard Reports:</strong> Install, event, cohort, and LTV reporting'},
+            {text:'<strong>Reports → Query:</strong> Custom SQL-style report builder for advanced analysis',highlight:true},
+            {text:'<strong>Fraud Console (ProtectIQ):</strong> Real-time fraud detection and blocking'},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'You\'re launching a GolfPass campaign on both iOS and Android. How many Kochava "App" objects do you need to create?',
+          options:['One — apps are cross-platform in Kochava','Two — one for iOS, one for Android','One per campaign you\'re running','One per ad network'],
+          correct:1,
+          explanation:'Correct! iOS and Android must be separate apps in Kochava. They use different device identifiers (IDFA vs GAID), different attribution methods (ATT/SKAN vs Google Play Referrer), and different SDK implementations. Combining them would make your data impossible to segment properly.'
+        },
+        {
+          question:'The Kochava SDK is installed in GolfPass but your developer only initializes it on the install event, not on every app open. What data will you be missing?',
+          options:['Nothing — install is the only event Kochava needs','Session data, app opens, and re-engagement attribution — the SDK must initialize on every open to capture these','Purchase events only','Deep link data'],
+          correct:1,
+          explanation:'Correct! The Kochava SDK must be called on every app open (not just install) to enable session tracking, retention reporting, and re-engagement attribution. Re-engagement campaigns in particular rely on the SDK firing on app open to attribute lapsed users returning via a retargeting ad.'
+        },
+        {
+          question:'A Meta iOS tracker link is missing the {idfa} macro. What is the most likely result?',
+          options:['The tracker link won\'t work at all','Kochava won\'t receive the device\'s IDFA at click-time, making deterministic matching impossible for those clicks — falls back to probabilistic only','Meta will reject the tracker link','Revenue reporting will be incorrect'],
+          correct:1,
+          explanation:'Correct! Without the IDFA macro in the click URL, Kochava never receives the device identifier at click-time. When the install fires later, Kochava can\'t do deterministic (exact) matching — it falls back to probabilistic matching, which is less accurate and leads to under-attribution of Meta campaigns.'
+        }
+      ]
+    }
+  },
+  {
+    id:3, level:'beginner', icon:'🆔', iconClass:'icon-green',
+    title:'Device Identifiers: IDFA, GAID & Beyond',
+    desc:'The currency of mobile attribution — the IDs that make matching possible.',
+    lessons:11, mins:26,
+    content:{
+      overview:`In web PPC, cookies link ad clicks to website conversions. In mobile, device identifiers serve that role — but they're platform-specific, user-resettable, and increasingly restricted by privacy laws and platform policy. Understanding identifiers is non-negotiable for anyone managing mobile measurement, because every attribution method ultimately depends on them.`,
+      sections:[
+        {
+          heading:'The Major Device Identifiers Explained',
+          items:[
+            {text:'<strong>IDFA (Identifier for Advertisers) — iOS:</strong> Apple\'s advertising ID. Resettable by the user. Since iOS 14.5, requires explicit ATT opt-in via a system permission prompt. The "gold standard" for iOS attribution when available.',highlight:true},
+            {text:'<strong>GAID (Google Advertising ID) — Android:</strong> Google\'s equivalent of IDFA. Still broadly available without a permission prompt (user can opt out in Settings → Privacy → Ads). Used for deterministic attribution on Android.'},
+            {text:'<strong>IDFV (Identifier for Vendor) — iOS:</strong> Shared across all apps from the same developer on a single device. Resets if all the developer\'s apps are deleted. Not shareable with ad networks, but useful for cross-app analytics within your own portfolio.',highlight:true},
+            {text:'<strong>Android ID:</strong> Hardware-bound. Available when GAID is unavailable (e.g., Huawei devices without Google Play Services). Less commonly used in standard attribution.'},
+            {text:'<strong>Probabilistic/Fingerprint ID:</strong> No actual device ID — instead, a "fingerprint" derived from signals: IP address, user agent, screen resolution, OS version, time of click. Less precise, used as fallback when no ID is available.'},
+          ]
+        },
+        {
+          heading:'iOS 14.5+ and the ATT Framework — The Big Change',
+          body:`Apple's App Tracking Transparency (ATT) framework, launched April 2021 with iOS 14.5, fundamentally changed mobile measurement. Before ATT, IDFA was available by default. After ATT, apps must show a system permission prompt and users must explicitly opt in before the IDFA is accessible.`,
+          items:[
+            {text:'<strong>Industry opt-in rates:</strong> Gaming: ~20–30% | Utility/Productivity: ~40–50% | Subscription (like GolfPass): ~30–40%',highlight:true},
+            {text:'<strong>What happens when user declines:</strong> IDFA returns as a string of zeros (00000000-0000-0000-0000-000000000000). Kochava falls back to probabilistic matching and/or SKAdNetwork data.'},
+            {text:'<strong>ATT prompt timing:</strong> Best practice is to show your own "pre-prompt" explaining the value before triggering the system prompt. This significantly improves opt-in rates.'},
+            {text:'<strong>Impact on your reporting:</strong> iOS install numbers in Kochava will be lower than in Meta\'s own dashboard because Meta uses its own Aggregated Event Measurement (AEM) for users who declined ATT.',highlight:true},
+          ],
+          warning:{label:'⚠️ The Discrepancy Problem',text:'The gap between Kochava iOS installs and Meta iOS installs is often 20–40% because Meta self-attributes even when IDFA is unavailable (using modeled conversions), while Kochava can only count what it can match. This is expected — not a bug. Use Kochava as ground truth for budget decisions.'}
+        },
+        {
+          heading:'SKAdNetwork (SKAN): Apple\'s Privacy Framework',
+          body:`When IDFA isn't available, iOS attribution runs through SKAdNetwork — Apple's built-in attribution framework that provides aggregated install data to ad networks without exposing individual user IDs.`,
+          items:[
+            {text:'<strong>How SKAN works:</strong> Apple\'s OS sends a postback directly to the ad network after install. No user-level data. Delayed by 24–72 hours.',highlight:true},
+            {text:'<strong>Conversion values (0–63):</strong> A 6-bit number you map to post-install activity. E.g., 0=no action, 1=registration, 5=purchase. You define this mapping.'},
+            {text:'<strong>SKAN 4.0 (iOS 16.1+):</strong> Three postback windows (0–2 days, 3–7 days, 8–35 days) for better LTV measurement. Coarse values (low/medium/high) for windows 2 and 3.'},
+            {text:'<strong>Kochava\'s role:</strong> Kochava decodes your SKAN conversion values, maps them back to your event schema, and integrates SKAN data into your unified dashboard.',highlight:true},
+          ]
+        },
+        {
+          heading:'Probabilistic Matching Deep Dive',
+          body:`When neither IDFA nor GAID is available, Kochava uses probabilistic matching — creating a "fingerprint" from available signals and matching it between the click and the install.`,
+          items:[
+            {text:'<strong>Signals used:</strong> IP address (most important), User Agent, device model, OS version, screen size, time of day'},
+            {text:'<strong>Match window:</strong> Probabilistic matches are typically accepted within 24–72 hours. Longer windows increase false positives.',highlight:true},
+            {text:'<strong>Accuracy:</strong> ~70–85% accuracy on iOS. Less reliable on shared IPs (corporate WiFi, VPNs). Much less reliable than deterministic.'},
+            {text:'<strong>Kochava setting:</strong> You can enable/disable probabilistic matching per app and set the confidence threshold. More aggressive = more matches but lower accuracy.'},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'An iOS user has opted out of ATT tracking. When they install GolfPass after clicking a Meta ad, what device ID does Kochava receive?',
+          options:['The IDFV — Kochava uses this as a fallback','A string of zeros (00000000-0000-0000-0000-000000000000) — Kochava falls back to probabilistic and/or SKAN','The GAID — Kochava switches to Android ID on iOS','No data is collected at all for this install'],
+          correct:1,
+          explanation:'Correct! When a user declines ATT, Apple returns a zeroed-out IDFA. Kochava receives this and knows deterministic IDFA matching is impossible for this install. It then attempts probabilistic matching (IP/UA fingerprint) and/or uses SKAdNetwork data from Apple to attribute the install.'
+        },
+        {
+          question:'What is the primary purpose of SKAdNetwork (SKAN) conversion values?',
+          options:['To replace the IDFA entirely','To encrypt user data before sending to Kochava','To encode post-install activity (e.g., purchases, registrations) into a single 0–63 number that gets reported back to the ad network without user-level data','To block fraudulent installs'],
+          correct:2,
+          explanation:'Correct! SKAN conversion values (0–63) are how you communicate post-install behavior to ad networks in a privacy-preserving way. You define the mapping (e.g., value 10 = first purchase), and Apple reports this single number to the network. Kochava helps you decode and map these values back to your event taxonomy.'
+        },
+        {
+          question:'Why might GolfPass see 30–40% higher iOS install numbers in Meta Ads Manager compared to Kochava\'s dashboard?',
+          options:['Kochava has a bug with iOS tracking','Meta self-attributes installs using modeled conversions for ATT opt-out users, while Kochava only counts installs it can match via IDFA or probabilistic signals — the gap is expected','GolfPass hasn\'t implemented the Kochava SDK correctly','Meta tracks web conversions, not app installs'],
+          correct:1,
+          explanation:'Correct! This discrepancy is one of the most common questions in mobile measurement. Meta claims credit for installs even when IDFA is unavailable by using statistical modeling. Kochava, as an independent MMP, only attributes installs with sufficient matching confidence. The Kochava number is more conservative and accurate for budget decision-making.'
+        }
+      ]
+    }
+  },
+  {
+    id:4, level:'beginner', icon:'📬', iconClass:'icon-green',
+    title:'Postbacks & Event Tracking Basics',
+    desc:'How Kochava sends signals back to your ad networks — the optimization loop.',
+    lessons:9, mins:22,
+    content:{
+      overview:`A postback is a server-to-server (S2S) signal that Kochava sends to your ad network when a tracked event occurs. It's how Meta's algorithm learns that an install led to a subscription, and how Google's smart bidding knows which clicks produced revenue. Without correctly configured postbacks, all your in-app events live in Kochava's dashboard but never reach the networks — leaving them blind to optimize against.`,
+      sections:[
+        {
+          heading:'The Complete Postback Flow',
+          items:[
+            {text:'<strong>1. User clicks ad</strong> → ad network records click, assigns a unique Click ID (e.g., Meta\'s fbclid)',highlight:true},
+            {text:'<strong>2. Click passes through Kochava tracker</strong> → Kochava stores: click ID, device ID, timestamp, network, campaign'},
+            {text:'<strong>3. User installs app</strong> → Kochava SDK fires "install" event with device ID'},
+            {text:'<strong>4. Kochava matches</strong> install device ID to stored click record'},
+            {text:'<strong>5. Kochava sends install postback</strong> to Meta: POST https://graph.facebook.com/... with fbclid',highlight:true},
+            {text:'<strong>6. User completes in-app purchase</strong> → SDK fires "Purchase" event with $99 revenue'},
+            {text:'<strong>7. Kochava sends purchase postback</strong> to Meta: "The user from click [fbclid] just subscribed for $99"'},
+            {text:'<strong>8. Meta uses this signal</strong> for smart bidding — optimizes toward users likely to subscribe',highlight:true},
+          ]
+        },
+        {
+          heading:'Types of Postbacks and When to Use Them',
+          items:[
+            {text:'<strong>Install Postback:</strong> Fires on first app open. Required for all campaigns. The baseline signal every network needs.',highlight:true},
+            {text:'<strong>In-App Event Postback:</strong> Purchase, Subscribe, Registration, etc. These are what drive optimization. Configure for every event that matters to your campaigns.'},
+            {text:'<strong>Re-engagement Postback:</strong> Fires when a lapsed user returns to the app via a retargeting ad. Critical for retargeting campaign measurement.'},
+            {text:'<strong>Uninstall Postback:</strong> Fires when a user uninstalls the app. Useful for churn analysis and suppression list building.',highlight:true},
+          ]
+        },
+        {
+          heading:'Critical Postback Settings',
+          body:`These settings in Kochava's Partner Configuration section directly affect your optimization. Getting them wrong is a common source of poor campaign performance.`,
+          code:`Postback Configuration (Meta iOS Example):
+  Network:              Meta (Facebook)
+  Platform:             iOS
+  Event Trigger:        Purchase
+  Postback Frequency:   All Events (not just first)
+  Post to:              ALL installs ← CRITICAL
+  Revenue Forwarding:   ✅ Enabled
+  Currency:             USD
+  De-duplicate:         No`,
+          warning:{label:'⚠️ "All Installs" vs "Matched Only"',text:'"Matched Only" means Kochava only sends a postback when it can deterministically match the install to that network\'s click. "All Installs" sends a postback for every install, even if Kochava couldn\'t match it. Always use ALL INSTALLS for Meta and Google — their ML bidding models require volume to train, and starving them of signal destroys campaign performance. Only use Matched Only if a network explicitly requests it.'}
+        },
+        {
+          heading:'Revenue Forwarding',
+          body:`When a purchase event fires, Kochava can forward the revenue value to the ad network. This enables ROAS-based bidding (tROAS) on Meta and Google. Without revenue forwarding, the network only sees "a purchase happened" but not for how much — making ROAS optimization impossible.`,
+          items:[
+            {text:'<strong>Enable Revenue Forwarding</strong> in every event postback where money changes hands',highlight:true},
+            {text:'<strong>Currency consistency:</strong> Pass revenue in the same currency across all networks (USD is standard)'},
+            {text:'<strong>Gross vs Net:</strong> Forward gross revenue unless told otherwise — networks optimize better on gross and you can normalize in reporting'},
+            {text:'<strong>Test it:</strong> After enabling, use Kochava\'s Postback Log to confirm revenue values are actually being sent'},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'Meta is running GolfPass acquisition campaigns but CPL is trending high. You check and realize postbacks are set to "Matched Only." What is the likely impact on Meta\'s bidding?',
+          options:['No impact — matched installs are all Meta needs','Meta is only receiving a fraction of actual install/event signals, starving its ML bidding model, which causes it to over-bid on wrong users or under-deliver','Meta prefers matched-only postbacks for accuracy','The CPL will improve because Kochava is being more precise'],
+          correct:1,
+          explanation:'Correct! With "Matched Only," Meta\'s algorithm receives far fewer signals (only the subset of installs Kochava could deterministically attribute to Meta). This creates a data scarcity problem for Meta\'s ML model, which needs volume to optimize. Switching to "All Installs" gives Meta the full signal and almost always improves bidding efficiency.'
+        },
+        {
+          question:'You enable a "Subscribe" event postback to Meta but forget to enable Revenue Forwarding. What bidding capability does this prevent?',
+          options:['Meta can\'t show ads to new users','Meta can see that subscriptions happened but can\'t optimize for ROAS (tROAS bidding) because it doesn\'t know the revenue value','The postback won\'t fire at all without revenue data','Meta requires revenue forwarding by policy'],
+          correct:1,
+          explanation:'Correct! Without revenue values in the postback, Meta\'s smart bidding can only optimize toward "subscriptions happened" — not toward revenue. For a $99/year subscription product like GolfPass+, enabling revenue forwarding is essential to unlock tROAS bidding, which dramatically improves acquisition efficiency.'
+        },
+        {
+          question:'What is a Re-engagement Postback and when is it used?',
+          options:['A postback that fires when someone clicks an ad twice','A postback that fires when a lapsed app user returns to the app via a retargeting ad — used to measure and optimize re-engagement campaigns','A duplicate of the install postback sent for verification','A postback that confirms the user watched a video ad'],
+          correct:1,
+          explanation:'Correct! Re-engagement postbacks are critical for retargeting campaigns where you\'re trying to bring back users who installed the app but never subscribed (or subscribed and lapsed). Without re-engagement postbacks properly configured, you can\'t measure whether your retargeting campaigns are actually driving meaningful actions.'
+        }
+      ]
+    }
+  },
+
+  // ══════════════════════════════
+  //  INTERMEDIATE
+  // ══════════════════════════════
+  {
+    id:5, level:'intermediate', icon:'🔗', iconClass:'icon-yellow',
+    title:'Building & Managing Tracker Links',
+    desc:'Deep dive into tracker setup, macros, naming conventions, and campaign organization.',
+    lessons:13, mins:32,
+    content:{
+      overview:`Tracker links are the foundation of every mobile campaign. They're your mobile UTMs — but richer and more powerful. A well-structured tracker setup means clean, queryable data; a sloppy setup means days of reconciliation and arguments with your network reps about install counts. This module covers everything you need to build trackers correctly, at scale.`,
+      sections:[
+        {
+          heading:'Tracker Link Anatomy',
+          body:`A Kochava tracker link is a URL that captures click metadata and routes users to the appropriate app store. Every parameter you pass becomes a dimension in your reporting.`,
+          code:`// Full Tracker Link Example (Meta iOS)
+https://control.kochava.com/v1/cpi/click
+  ?campaign_id=koios-golfpass-abc123     ← Kochava auto-generates
+  &network_id=2                          ← Meta's network ID in Kochava
+  &site_id={site_id}                     ← Meta publisher/placement macro
+  &creative_id={ad_id}                   ← Meta ad ID macro
+  &device_id={idfa}                      ← iOS device ID macro
+  &click_id={fbclid}                     ← Meta's click ID macro
+  &adset_id={adset_id}                   ← adset dimension
+  &campaign_name={campaign_name}         ← campaign name macro
+  &deep_link=golfpass://offer/summer25   ← deferred deep link destination`,
+          items:[
+            {text:'<strong>campaign_id:</strong> Kochava auto-generates this. Ties the click to your specific tracker configuration.',highlight:true},
+            {text:'<strong>network_id:</strong> Identifies the source network in Kochava. Must match the correct partner.'},
+            {text:'<strong>device_id + click_id:</strong> The two most critical parameters. These enable deterministic attribution. Never omit them.',highlight:true},
+          ]
+        },
+        {
+          heading:'Critical Macros by Platform',
+          body:`Each ad network has its own macro syntax. Using the wrong macro means Kochava never receives the device ID — destroying match rates. Always verify in each platform's documentation.`,
+          items:[
+            {text:'<strong>Meta (Facebook/Instagram):</strong> Device: {idfa} (iOS) / {madid} (Android). Click ID: {fbclid}',highlight:true},
+            {text:'<strong>Google UAC:</strong> Device: {adid} (both platforms). Click ID: {gclid} or {wbraid}/{gbraid} for iOS privacy'},
+            {text:'<strong>TikTok:</strong> Device: {idfa} (iOS) / {aid_id} (Android). Click ID: {ttclid}'},
+            {text:'<strong>Snapchat:</strong> Device: {idfa} / {aaid}. Click ID: {snapcid}'},
+            {text:'<strong>Apple Search Ads:</strong> No tracker URL — uses AdServices API. Configure via ASA integration tab in Kochava.',highlight:true},
+            {text:'<strong>Twitter/X:</strong> Device: {idfa} / {adid}. Click ID: {twclid}'},
+          ]
+        },
+        {
+          heading:'Naming Conventions — Don\'t Skip This',
+          body:`Naming is what makes your tracker data queryable. If you don't enforce a convention before launch, you'll spend hours cleaning data later. Establish your taxonomy, document it, and enforce it across your team.`,
+          code:`Recommended Naming Pattern:
+[Platform]_[OS]_[ObjectiveType]_[AudienceType]_[Creative]_[YYYYMM]
+
+Examples:
+Meta_iOS_Install_Prospecting_VideoA_202604
+Meta_And_Install_Retarget_StaticB_202604
+TikTok_iOS_Install_LAL-Subscribers_UGC1_202604
+Google_iOS_ROAS_Broad_RSA_202604
+ASA_iOS_Install_BrandKW_Exact_202604
+
+❌ Bad naming:
+"test tracker"
+"Meta campaign 4/15"
+"new ads"`,
+          tip:{label:'📋 Scale Tip',text:'For large campaign launches (20+ trackers), use Kochava\'s bulk tracker creation. Export the CSV template from Apps & Assets → Trackers → Bulk Create, fill in your structured data, and re-import. Saves hours and enforces naming consistency.'}
+        },
+        {
+          heading:'Tracker Best Practices',
+          items:[
+            {text:'<strong>One tracker per campaign objective:</strong> Don\'t reuse trackers across campaigns — it pollutes your attribution data.',highlight:true},
+            {text:'<strong>Never share trackers across networks:</strong> If you use the same tracker for Meta and TikTok, Kochava can\'t tell which network drove which install.'},
+            {text:'<strong>Archive don\'t delete:</strong> Archive old trackers rather than deleting them. Deleted trackers lose their historical data.'},
+            {text:'<strong>Test before launch:</strong> Use Kochava\'s tracker preview/test feature and Kochava\'s test device registration to confirm clicks are recording before spending any budget.',highlight:true},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'A TikTok Android tracker link is using {idfa} as the device_id macro. What is wrong with this?',
+          options:['Nothing — {idfa} works on all platforms','{idfa} is Apple\'s iOS identifier. Android uses {aid_id} or {gaid}. Using {idfa} on Android means Kochava never receives a valid device ID, making deterministic attribution impossible for TikTok Android','TikTok doesn\'t support the device_id parameter','The tracker link needs two device_id parameters for Android'],
+          correct:1,
+          explanation:'Correct! IDFA is exclusively an iOS identifier. On Android, TikTok passes the Google Advertising ID via the {aid_id} macro (or {gaid} depending on TikTok\'s current documentation). Using an iOS macro in an Android tracker returns nothing — Kochava gets no device ID and can\'t do deterministic matching.'
+        },
+        {
+          question:'Why should you never reuse the same Kochava tracker link across multiple ad networks?',
+          options:['Kochava charges per tracker link','A shared tracker can\'t distinguish which network drove each click — all installs show as one source, making network-level ROAS analysis impossible','Networks block shared tracker links','It creates duplicate postbacks'],
+          correct:1,
+          explanation:'Correct! Each tracker link is the attribution source identifier. If Meta and TikTok share a tracker, every install attributed to that tracker is ambiguous — Kochava doesn\'t know if it came from Meta or TikTok. You lose the ability to compare network performance, optimize budgets across platforms, or hold networks accountable for their install counts.'
+        },
+        {
+          question:'You launch a campaign and 3 days later discover the tracker link was missing the {fbclid} click ID macro for Meta. What is the impact on past installs?',
+          options:['You can retroactively fix attribution by updating the tracker','Past installs during those 3 days cannot be retroactively attributed to Meta — the click ID was never stored, so the match is permanently lost','Kochava automatically uses probabilistic matching so nothing is lost','Meta will send the click IDs separately to Kochava'],
+          correct:1,
+          explanation:'Correct! Attribution is based on data captured at click-time. If the click ID macro was missing when users clicked your ads, Kochava never stored those click IDs. You can\'t go back and add them retroactively. Those 3 days of installs will be attributed via probabilistic matching only (lower accuracy) or show as unattributed. Always test tracker links before launch.'
+        }
+      ]
+    }
+  },
+  {
+    id:6, level:'intermediate', icon:'📊', iconClass:'icon-yellow',
+    title:'In-App Events: Setup & Strategy',
+    desc:'Designing your event taxonomy, implementing events correctly, and optimizing for real business value.',
+    lessons:12, mins:30,
+    content:{
+      overview:`In-app events are the heartbeat of mobile measurement. They're the equivalent of conversion goals in web PPC — but richer, more flexible, and closer to actual revenue. The difference between a mediocre mobile measurement setup and a great one often comes down to event taxonomy quality. This module covers how to think about events strategically, not just technically.`,
+      sections:[
+        {
+          heading:'Standard Kochava Event Types',
+          body:`Kochava supports both standard event names (which integrate seamlessly with ad network optimization) and fully custom events. Use standard event names wherever possible — they map directly to Meta's Events, Google's Conversion Actions, and TikTok's Events.`,
+          items:[
+            {text:'<strong>Purchase:</strong> Any real-money transaction. Pass revenue + currency. The most important event for subscription apps.',highlight:true},
+            {text:'<strong>Subscribe:</strong> Subscription start event. Different from Purchase — carry subscription_type and product_id.'},
+            {text:'<strong>Registration / Complete Registration:</strong> User creates an account. Key for funnel analysis.'},
+            {text:'<strong>Add to Cart:</strong> Intent signal. Great for retargeting audience building.',highlight:true},
+            {text:'<strong>Tutorial Complete:</strong> Onboarding completion. Proxy for user quality — users who finish onboarding have much higher retention.'},
+            {text:'<strong>Level Complete / Achievement Unlocked:</strong> Gaming-specific engagement signals.'},
+            {text:'<strong>Ad Click (In-App):</strong> Useful for apps with in-app advertising revenue models.'},
+            {text:'<strong>Start Trial:</strong> For freemium apps — marks when a user begins a free trial period.',highlight:true},
+          ]
+        },
+        {
+          heading:'Designing Your Event Taxonomy',
+          body:`Your event taxonomy should map to your user journey stages. For a subscription app like GolfPass+, the journey is: Install → Register → Onboard → Browse content → Start Trial → Subscribe → Renew. Each stage should have a corresponding event.`,
+          code:`// GolfPass+ Event Taxonomy (Recommended)
+{
+  "Install":            auto (SDK),
+  "Registration":       user creates account,
+  "Tutorial Complete":  completes app onboarding,
+  "Content View":       views a course/lesson/tee time,
+  "Search":             searches for tee times or courses,
+  "Add to Cart":        adds booking to cart,
+  "Start Trial":        begins 7-day free trial,
+  "Subscribe":          completes GolfPass+ subscription,
+  "Purchase":           books a tee time with GolfPass credits,
+  "Renewal":            subscription renewed (via S2S)
+}`,
+          tip:{label:'🎯 GolfPass Priority Events',text:'For bidding optimization, your top 3 events in priority order are: 1) Subscribe ($99 revenue) — primary ROAS signal; 2) Start Trial — leading indicator of subscribe, higher volume; 3) Registration — highest volume, proxy for engaged users. Pass all three to Meta and Google to give bidding algorithms a funnel to work with.'}
+        },
+        {
+          heading:'Event Payload Best Practices',
+          body:`Every event can carry a payload of metadata. Richer payloads = better optimization signals and more actionable reporting. Always pass more than the minimum.`,
+          code:`// Subscribe Event — Full Payload
+{
+  "event_name":         "Subscribe",
+  "event_data": {
+    "product_id":       "golfpass_plus_annual",
+    "price":            99.00,
+    "currency":         "USD",
+    "subscription_type":"annual",
+    "is_trial_convert": true,
+    "user_days_to_sub": 14,
+    "acquisition_source":"meta_prospecting"
+  }
+}`,
+          items:[
+            {text:'<strong>Always pass price + currency</strong> on any revenue event. This enables ROAS reporting.',highlight:true},
+            {text:'<strong>Product ID:</strong> Lets you break down revenue by SKU in reporting.'},
+            {text:'<strong>Custom dimensions:</strong> Anything you want to slice reporting by — audience type, creative, user segment.'},
+          ]
+        },
+        {
+          heading:'Event Verification Before Launch',
+          items:[
+            {text:'<strong>Register a test device:</strong> In Kochava dashboard → Apps & Assets → Test Devices. Add your device\'s IDFA/GAID. Test events are isolated from production data.',highlight:true},
+            {text:'<strong>Kochava EventViewer:</strong> Dashboard → Reports → EventViewer. Real-time event log. Use to confirm each event is firing with correct payload.'},
+            {text:'<strong>Postback log:</strong> Dashboard → Postback Log. Verify events are actually flowing to your networks (not just recorded in Kochava).'},
+            {text:'<strong>Checklist before launch:</strong> All events firing ✓ · Revenue data in payloads ✓ · Postbacks configured for all networks ✓ · Revenue forwarding enabled ✓',highlight:true},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'For GolfPass+ campaign optimization, you can only pass ONE event to Meta for bidding. Which should it be?',
+          options:['Install — highest volume gives Meta the most data','Registration — more volume than subscribe','Subscribe with $99 revenue — closest to actual business outcome and enables ROAS bidding','Content View — shows engaged users'],
+          correct:2,
+          explanation:'Correct! Always optimize toward the event closest to revenue with sufficient volume. The Subscribe event with $99 revenue attached enables Meta\'s tROAS (target ROAS) bidding — the most powerful optimization lever available. If subscribe volume is too low (<50/week), then Start Trial is the next best option as it\'s a strong leading indicator.'
+        },
+        {
+          question:'A GolfPass+ Subscribe event is firing in Kochava but there\'s no revenue data in the payload. What optimization capability is lost?',
+          options:['Nothing — subscribe event is sufficient for all bidding types','ROAS-based bidding (tROAS) is impossible without revenue values — the network can optimize for "subscriptions" but not for revenue efficiency','The event won\'t be attributed correctly','Postbacks will fail to send'],
+          correct:1,
+          explanation:'Correct! Without revenue in the payload, Meta and Google only see "a subscribe event happened" — not the $99 value. This prevents tROAS bidding and means you\'re leaving your most powerful optimization tool unused. Always pass price + currency on every revenue event.'
+        },
+        {
+          question:'You want to build a retargeting audience of users who added a tee time to cart but didn\'t complete the booking. Which event(s) are needed?',
+          options:['Just the Purchase event','Add to Cart event AND Purchase event — the audience is users who fired Add to Cart but NOT Purchase','Install event only','Content View and Registration events'],
+          correct:1,
+          explanation:'Correct! To build this retargeting audience, you need both events tracked: Add to Cart (to identify intent) and Purchase (to exclude converters). Kochava\'s audience builder can create segments like "fired Add_to_Cart in last 30 days but NOT Purchase." This high-intent segment typically converts much better than broad retargeting.'
+        }
+      ]
+    }
+  },
+  {
+    id:7, level:'intermediate', icon:'🧩', iconClass:'icon-yellow',
+    title:'Deep Linking & Deferred Deep Linking',
+    desc:'Sending users exactly where they need to go — inside the app, every time.',
+    lessons:10, mins:26,
+    content:{
+      overview:`A deep link is a URL that opens a specific screen inside your app instead of the home screen. Deferred deep links do this even when the app isn't installed yet — the user gets sent to the App Store, installs the app, and on first launch is automatically routed to the right destination. For e-commerce, subscription, and content apps, deep linking is a significant conversion rate lever.`,
+      sections:[
+        {
+          heading:'Types of Deep Links',
+          items:[
+            {text:'<strong>Basic Deep Link:</strong> Opens a specific in-app screen IF the app is already installed. Falls to App Store if not. Use for email, SMS, push notifications to existing users.',highlight:true},
+            {text:'<strong>Deferred Deep Link:</strong> Works even when app isn\'t installed. User clicks → App Store → installs → Kochava delivers the deep link destination on first open. Primary use case: paid acquisition campaigns.'},
+            {text:'<strong>Universal Links (iOS):</strong> Apple\'s preferred format. Registered domains that iOS intercepts and opens in-app. More reliable than custom URL schemes (golfpass://).',highlight:true},
+            {text:'<strong>App Links (Android):</strong> Android equivalent of Universal Links. Uses assetlinks.json for verification.'},
+            {text:'<strong>Custom URI Scheme:</strong> e.g., golfpass://offer/summer25. Simple but can be intercepted by other apps. Less preferred than Universal/App Links.'},
+          ]
+        },
+        {
+          heading:'How Kochava Handles Deferred Deep Links',
+          body:`This is the technical flow that makes deferred deep linking work through the App Store black box:`,
+          items:[
+            {text:'<strong>Step 1:</strong> User taps ad with Kochava tracker that includes a deep_link parameter',highlight:true},
+            {text:'<strong>Step 2:</strong> Kochava stores the deep link destination server-side, keyed to the device ID'},
+            {text:'<strong>Step 3:</strong> User goes to App Store, downloads app'},
+            {text:'<strong>Step 4:</strong> App opens → Kochava SDK fires → SDK retrieves stored deep link for this device ID',highlight:true},
+            {text:'<strong>Step 5:</strong> Kochava SDK delivers the deep link to the app → app navigates to the right screen'},
+            {text:'<strong>Step 6:</strong> All of this happens in ~200ms on first launch — user experience feels seamless'},
+          ]
+        },
+        {
+          heading:'SmartLinks: One Link for All Destinations',
+          body:`SmartLinks are single Kochava URLs that intelligently route users based on their device and app install status. Use them when you don't control the surface (email campaigns, influencer links, social bios) and users could be on any device.`,
+          items:[
+            {text:'<strong>Logic tree:</strong> iOS with app installed → opens in-app | iOS without app → App Store | Android with app → opens in-app | Android without app → Play Store | Desktop → web fallback',highlight:true},
+            {text:'<strong>Best for:</strong> Email campaigns, SMS blasts, QR codes, social bios, influencer posts'},
+            {text:'<strong>Attribution:</strong> SmartLinks are fully attributed — every click is tracked and can be tied back to installs and events.'},
+          ]
+        },
+        {
+          heading:'Deep Link Impact on Conversions',
+          body:`The business case for deep linking is strong and well-documented. Users who land on a relevant in-app screen convert at significantly higher rates than users dropped on the home screen.`,
+          items:[
+            {text:'<strong>Typical lift:</strong> 20–40% higher conversion rate when deep linking to relevant content vs home screen',highlight:true},
+            {text:'<strong>GolfPass application:</strong> Link to: specific course pages, active tee time offers, the subscription paywall, or a "welcome" onboarding screen for new users'},
+            {text:'<strong>Personalization:</strong> Pass UTM-style parameters through the deep link to personalize in-app messaging for campaign users'},
+          ],
+          tip:{label:'🏌️ Practical Example',text:'Summer campaign ad: "Book tee times from $29 this weekend." Deep link destination: the tee time search results page pre-filtered to this weekend\'s availability. Without deep linking, the user lands on the GolfPass home screen and has to navigate themselves — most don\'t. With deep linking, they\'re immediately in the purchase flow.'}
+        }
+      ],
+      quizzes:[
+        {
+          question:'You\'re running a Meta campaign for GolfPass+ with a promotional offer. A user without the app installed clicks the ad. With deferred deep linking configured, what happens after they install the app?',
+          options:['They land on the GolfPass home screen — deep linking only works for existing users','On first app open, Kochava SDK retrieves the stored deep link and routes them directly to the promotional offer screen','They receive a push notification with the offer link','The offer is displayed as an interstitial on first launch by the app developer'],
+          correct:1,
+          explanation:'Correct! Kochava stores the deep link destination at click-time (keyed to the device ID). When the user installs and opens the app, the SDK immediately retrieves this stored destination and delivers it to the app — routing the user to the offer screen on first launch. This significantly improves conversion rates vs landing on the home screen.'
+        },
+        {
+          question:'What is a SmartLink and when is it preferable to a standard Kochava tracker link?',
+          options:['SmartLinks are faster tracker links — always use them','A SmartLink is a single URL that auto-routes users based on device (iOS/Android) and app install status — preferable when you don\'t control the surface (email, SMS, social bio) and users could be on any device','SmartLinks bypass the App Store for faster installs','SmartLinks are only for retargeting campaigns'],
+          correct:1,
+          explanation:'Correct! Standard tracker links are platform-specific (you create separate iOS and Android trackers). SmartLinks handle the routing logic automatically. They\'re ideal for email newsletters, SMS campaigns, influencer links, and any surface where you can\'t control which device the user is on.'
+        },
+        {
+          question:'Your GolfPass iOS app uses custom URI scheme deep links (golfpass://). Apple recommends switching to Universal Links. Why?',
+          options:['Custom URI schemes don\'t support deferred deep linking','Custom URI schemes can be claimed by any app — if another app registers the same scheme, your deep links could open the wrong app. Universal Links use verified domain ownership and are more secure and reliable.','"golfpass://" requires a separate SDK','Universal Links are required for App Store approval'],
+          correct:1,
+          explanation:'Correct! Custom URI schemes have a critical vulnerability: any other app on the device could register the same scheme and intercept your deep links. Apple\'s Universal Links solve this with HTTPS domain verification — only your app can respond to links from your verified domain. They\'re also more reliable because iOS handles the routing at the OS level.'
+        }
+      ]
+    }
+  },
+  {
+    id:8, level:'intermediate', icon:'🔌', iconClass:'icon-yellow',
+    title:'Network Integrations & Partner Setup',
+    desc:'Connecting Kochava to Meta, Google, TikTok, Apple Search Ads — correctly.',
+    lessons:14, mins:34,
+    content:{
+      overview:`Each ad network has unique integration requirements with Kochava. Setting these up correctly is what separates good mobile marketers from great ones. A misconfigured integration can mean zero optimization signals reaching your bidding algorithms — you're spending budget blind. This module walks through the four most important platform integrations step by step.`,
+      sections:[
+        {
+          heading:'Meta (Facebook & Instagram)',
+          body:`Meta is typically the highest-volume mobile acquisition channel. The integration has several layers — get all of them right.`,
+          items:[
+            {text:'<strong>Step 1: MMP Authorization</strong> — In Meta Business Settings → Apps → [Your App] → Mobile Measurement Partner → Select Kochava. This authorizes Kochava to receive click data from Meta.',highlight:true},
+            {text:'<strong>Step 2: App Dashboard Setup</strong> — Ensure your app is created in Meta App Dashboard. App Store URL must match Kochava\'s app configuration exactly.'},
+            {text:'<strong>Step 3: Postback Events</strong> — Configure each event in Kochava → Partner Config → Meta → Events. Enable revenue forwarding on Purchase/Subscribe events.',highlight:true},
+            {text:'<strong>Step 4: AEM (Aggregated Event Measurement)</strong> — For iOS, configure up to 8 conversion events in Meta Events Manager in priority order. Kochava events must map to the same names.'},
+            {text:'<strong>Step 5: App Events Forwarding</strong> — Optional but recommended. Forwards Kochava events back to Meta Events Manager for audience building.'},
+          ]
+        },
+        {
+          heading:'Google UAC (App Campaigns)',
+          body:`Google App Campaigns auto-optimize across Search, Play Store, YouTube, Display, and Discover simultaneously. The integration with Kochava determines what signals Google's algorithm has to work with.`,
+          items:[
+            {text:'<strong>Firebase vs Kochava:</strong> Google natively prefers Firebase for attribution, but Kochava is a certified Google measurement partner. For multi-network campaigns, Kochava is preferable (single source of truth). For Google-only, Firebase is fine.',highlight:true},
+            {text:'<strong>Conversion import:</strong> In Google Ads → Tools → Conversions → Import → App → Firebase or Third-party app analytics → Select Kochava events.'},
+            {text:'<strong>Tracker URL:</strong> Google UAC requires a specific tracker URL format. Use Google\'s {adid} macro for device ID and {gclid} for click ID. For iOS privacy: use {wbraid} or {gbraid} alongside {gclid}.',highlight:true},
+            {text:'<strong>Target CPA vs tROAS:</strong> Use tCPA when subscribe volume is low (<30/week). Use tROAS when you have sufficient subscription signal (>50/week). Kochava feeds whichever signal you configure.'},
+          ]
+        },
+        {
+          heading:'TikTok',
+          items:[
+            {text:'<strong>Partner authorization:</strong> TikTok Ads Manager → Assets → Events → App Events → Kochava. Select your app.',highlight:true},
+            {text:'<strong>Tracker setup:</strong> Always pass {ttclid} for click ID and {idfa}/{aid_id} for device ID. Both are required for good match rates.'},
+            {text:'<strong>SKAN on TikTok:</strong> TikTok is a strong SKAN adopter. Enable SKAN integration in Kochava for iOS. Configure conversion values that map to your funnel.'},
+            {text:'<strong>Value-Based Optimization:</strong> TikTok\'s VBO bidding requires revenue values in postbacks — same as Meta tROAS. Enable revenue forwarding.',highlight:true},
+          ]
+        },
+        {
+          heading:'Apple Search Ads (ASA)',
+          body:`ASA is unique — there's no click URL, no manual tracker link setup, and attribution happens through Apple's AdServices framework automatically. But the integration still requires configuration in Kochava.`,
+          items:[
+            {text:'<strong>No tracker link needed:</strong> ASA attribution uses Apple\'s AdServices attribution token, read by the Kochava SDK on first open automatically.',highlight:true},
+            {text:'<strong>Enable the integration:</strong> Kochava Dashboard → Apps & Assets → [Your App] → Partner Configuration → Apple Search Ads → Enable.'},
+            {text:'<strong>Keyword reporting:</strong> Kochava surfaces ASA keyword + adgroup data in its reporting — helps identify which keywords drive quality installs vs just volume.',highlight:true},
+            {text:'<strong>SKAN for ASA:</strong> For iOS 14.5+ attribution on ASA, Kochava also ingests Apple\'s SKAN postbacks from ASA campaigns. No extra setup required.'},
+          ],
+          tip:{label:'💡 ASA Attribution Timing',text:'ASA attribution has a 30-day lookback window and uses Apple\'s own framework — it\'s deterministic and accurate. Unlike Meta/Google where you might see discrepancies, ASA numbers in Kochava are typically very close to what you see in ASA reporting because both use the same attribution token.'}
+        }
+      ],
+      quizzes:[
+        {
+          question:'You\'ve set up a TikTok campaign with a Kochava tracker but TikTok\'s dashboard shows 3x more installs than Kochava. The tracker link is missing the {ttclid} macro. Why does this gap occur?',
+          options:['TikTok always shows inflated numbers regardless of setup','Without {ttclid}, Kochava can\'t do deterministic matching for TikTok installs. TikTok self-attributes with its own modeled conversions. Kochava can only count installs it matches probabilistically — creating a large gap','Kochava has a lower install counting method for TikTok','The integration needs to be reset'],
+          correct:1,
+          explanation:'Correct! TikTok (like all self-attributing networks) claims credit for installs using its own click data. Without the {ttclid} macro in your Kochava tracker, Kochava has no TikTok click ID to match against — so it only counts the small subset it matches via probabilistic fingerprint. The solution is to add {ttclid} to the tracker, which will dramatically reduce the discrepancy.'
+        },
+        {
+          question:'For iOS Google App Campaigns, you\'re seeing install data in Google Ads but very low conversion import data from Kochava. You check and the integration is enabled. What else should you verify?',
+          options:['Nothing — Google Ads takes time to update','Verify that the Kochava event names exactly match the conversion action names set up in Google Ads, AND that revenue forwarding is enabled for revenue events. Name mismatches are the #1 cause of missing conversion imports.','The SKAN configuration for iOS','The Android tracker link'],
+          correct:1,
+          explanation:'Correct! Google Ads conversion import is name-sensitive. If Kochava is sending a "subscribe" event but Google Ads is looking for "Subscribe" (capital S) or "subscription_complete", no data will flow. Event names must match exactly. Also verify that the conversion window in Google Ads (typically 30 days for installs, 7 days for events) is appropriate for your user journey.'
+        },
+        {
+          question:'Why doesn\'t Apple Search Ads need a Kochava tracker link URL, unlike Meta, Google, and TikTok?',
+          options:['ASA doesn\'t support third-party measurement','Apple Search Ads uses the AdServices attribution framework built into iOS — the Kochava SDK reads the attribution token directly from Apple\'s API on first app open, without needing a click URL redirect','ASA tracks installs through the App Store directly','Kochava doesn\'t officially support ASA'],
+          correct:1,
+          explanation:'Correct! ASA attribution is fundamentally different because it\'s OS-level. When a user clicks an ASA ad and installs the app, Apple generates an attribution token. On first app open, the Kochava SDK queries Apple\'s AdServices API, retrieves this token, and sends it to Kochava for attribution. No URL redirect or click ID macro is involved — Apple handles the click-to-install linkage directly.'
+        }
+      ]
+    }
+  },
+
+  // ══════════════════════════════
+  //  ADVANCED
+  // ══════════════════════════════
+  {
+    id:9, level:'advanced', icon:'🛡️', iconClass:'icon-red',
+    title:'Mobile Ad Fraud: Detection & Prevention',
+    desc:'The industry\'s dirty secret — and how to protect your budget with ProtectIQ.',
+    lessons:14, mins:36,
+    content:{
+      overview:`Mobile ad fraud costs the industry an estimated $80+ billion annually. Unlike web click fraud (which Google partially protects against), mobile fraud is sophisticated, diverse, and constantly evolving. As a performance marketer, fraud directly eats your budget and distorts your optimization signals — causing your campaigns to target fake users while real acquisition opportunities go unfunded. Kochava's ProtectIQ is your primary defense.`,
+      sections:[
+        {
+          heading:'The Major Fraud Types',
+          items:[
+            {text:'<strong>Click Flooding / Click Spam:</strong> Fraudulent publisher sends millions of fake or bot-generated clicks. Statistically, some real organic installs will happen near these clicks — the fraudster steals credit via last-click attribution.',highlight:true},
+            {text:'<strong>Click Injection (Android):</strong> Malware installed on real user devices detects when a legitimate app download begins (via Android broadcast receivers) and fires a fake click milliseconds before the install completes — stealing last-click attribution from whoever drove the actual download.'},
+            {text:'<strong>SDK Spoofing:</strong> Attackers reverse-engineer SDK traffic and replay real SDK requests to generate fake installs without any real device or user. Highly sophisticated. Generates installs with realistic-looking data but zero real users.',highlight:true},
+            {text:'<strong>Device Farms:</strong> Warehouses of real physical devices (or emulated devices) systematically installing apps and performing in-app actions. Harder to detect because they use real device IDs and real app activity.'},
+            {text:'<strong>Incent Fraud / Motivated Traffic:</strong> Real users downloading apps for rewards (cash, gift cards, in-game currency) with zero intent to actually use the app. Technically not "fraud" but financially equivalent.'},
+            {text:'<strong>GEO Fraud:</strong> Installs served from a different geography than the targeted one — e.g., buying US-targeted installs but delivering them from Southeast Asia at lower cost.',highlight:true},
+          ]
+        },
+        {
+          heading:'Kochava ProtectIQ: How It Works',
+          body:`ProtectIQ analyzes every click and install through multiple fraud signal layers simultaneously. It operates in real-time, meaning fraudulent installs can be blocked before they're attributed (and before you pay for them).`,
+          items:[
+            {text:'<strong>Click-to-Install Time (CTIT):</strong> The most powerful fraud signal. Real user CTIT is 30 seconds to 3 hours. < 10 seconds = click injection. > 7 days = click spam.',highlight:true},
+            {text:'<strong>IP Analysis:</strong> Datacenter IPs, known VPN ranges, Tor exit nodes, and IPs on Kochava\'s fraud blacklist are flagged.'},
+            {text:'<strong>Device ID Anomalies:</strong> Same device ID generating multiple installs, IDFA/GAID that don\'t match typical device signatures, high device ID reuse rates.'},
+            {text:'<strong>Behavioral Analysis:</strong> Post-install behavior scoring. Legit users open the app, explore, maybe register. Fraud installs show zero post-install activity or unnaturally scripted behavior.',highlight:true},
+            {text:'<strong>SDK Signature Verification:</strong> Kochava validates that SDK calls carry authentic cryptographic signatures that can\'t be spoofed.'},
+          ]
+        },
+        {
+          heading:'Setting Up ProtectIQ',
+          code:`ProtectIQ Configuration Path:
+Dashboard → Apps & Assets → [Your App] → ProtectIQ
+
+Recommended Settings:
+✅ Enable ProtectIQ
+CTIT Minimum: 10 seconds
+CTIT Maximum: 168 hours (7 days)
+✅ Block datacenter IP installs
+✅ Flag high device ID reuse (threshold: 3 installs/device/30 days)
+✅ Enable behavioral analysis
+Behavioral threshold: >90% zero-event installs from a publisher → alert
+
+Fraud Response Modes:
+  "Flag" mode: marks suspected fraud, still attributes
+  "Block" mode: rejects fraudulent clicks/installs before attribution ← recommended`,
+          warning:{label:'⚠️ Block Mode Impact',text:'Switching from Flag to Block mode will immediately reduce your reported install numbers from fraud-heavy sources. This looks like a performance drop but is actually an improvement — you\'re stopping payment for fake installs. Brief your team before switching to manage expectations.'}
+        },
+        {
+          heading:'Publisher-Level Fraud Monitoring',
+          items:[
+            {text:'<strong>Audit regularly:</strong> Export publisher-level data monthly. Sort by CTIT distribution, post-install event rate, and device ID uniqueness.',highlight:true},
+            {text:'<strong>Red flags per publisher:</strong> >10% CTIT < 10s · Zero post-install event rate · Single IP generating many installs · GEO mismatch'},
+            {text:'<strong>Dispute process:</strong> When fraud is detected, Kochava\'s reports serve as documentation for chargebacks. Keep 90 days of logs.',highlight:true},
+            {text:'<strong>Whitelist vs open targeting:</strong> Limit non-guaranteed inventory to known, trusted publishers for high-value campaigns. Save open network for campaigns where fraud impact is lower.'},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'A publisher is showing 8,000 installs in the past week. Their CTIT distribution is: 40% under 5 seconds, 50% between 5–30 seconds, and 10% normal range (30s+). What fraud type is most likely occurring?',
+          options:['SDK Spoofing — the installs are entirely fake','Click Injection — the CTIT is impossibly fast for a human to complete the install flow, indicating a device-level injection of fake clicks right before installs complete','GEO fraud — the installs are from a different region','Incent fraud — users are being paid to install quickly'],
+          correct:1,
+          explanation:'Correct! A CTIT under 5–10 seconds is physically impossible for a normal install flow (tap ad → App Store → download → open takes at minimum 30+ seconds). This near-instant CTIT is the signature of Click Injection malware — it fires a fake click the moment it detects an install download starting on the device, stealing attribution. Pause this publisher immediately and file a fraud report.'
+        },
+        {
+          question:'SDK Spoofing is considered the most sophisticated form of mobile fraud. Why is it harder to detect than click spam?',
+          options:['SDK Spoofing happens too quickly for ProtectIQ to analyze','SDK Spoofing generates installs with realistic metadata by replaying captured real SDK traffic — there\'s no real device or user, but the data looks legitimate at first glance. Detection requires cryptographic signature validation.','ProtectIQ doesn\'t cover SDK Spoofing','SDK Spoofing only affects Android'],
+          correct:1,
+          explanation:'Correct! Click spam is detectable via CTIT anomalies. SDK Spoofing is harder because attackers replay authentic-looking SDK traffic — the install events have real device IDs, realistic CTIT, and proper formatting. Kochava detects it through cryptographic SDK signature verification (each legitimate SDK call carries a unique, unrepeateable signature) and behavioral analysis (spoofed installs have zero genuine post-install activity).'
+        },
+        {
+          question:'You switch ProtectIQ from "Flag" to "Block" mode for a publisher running 10,000 installs/month. The next day your install numbers from that publisher drop 60%. How should you interpret this?',
+          options:['Block mode is broken — contact Kochava support','The publisher\'s traffic was 60% fraudulent. Blocking those installs means you\'re now paying only for the 40% that are real. This is a positive result — your CPI went up but you\'re now buying real users.','You accidentally blocked the wrong publisher','Your CTIT settings are too aggressive'],
+          correct:1,
+          explanation:'Correct! A 60% drop after enabling Block mode means 60% of that publisher\'s installs were failing ProtectIQ\'s fraud checks. Your dashboard numbers look worse but your actual marketing efficiency improved — you\'re no longer paying for fake installs. Calculate your pre/post effective CPA on real users and you\'ll almost certainly see improvement.'
+        }
+      ]
+    }
+  },
+  {
+    id:10, level:'advanced', icon:'📐', iconClass:'icon-red',
+    title:'Cohort Analysis & LTV Measurement',
+    desc:'Moving beyond installs to understand user quality and real value over time.',
+    lessons:13, mins:32,
+    content:{
+      overview:`Install metrics tell you how many users you acquired. Cohort analysis tells you what those users are actually worth over time. This is the bridge between mobile attribution and real business intelligence. The best-performing mobile marketing teams use cohort analysis to optimize not for the cheapest installs, but for the highest-value installs — which is often a completely different channel.`,
+      sections:[
+        {
+          heading:'What Is a Cohort?',
+          body:`A cohort is a group of users who share a common characteristic — most commonly, the time window in which they installed your app. By grouping users this way, you can track their collective behavior over time and compare cohorts from different acquisition sources, time periods, or campaigns.`,
+          items:[
+            {text:'<strong>Install Date Cohort:</strong> "All users who installed GolfPass in April 2026" — track their 30-day, 60-day, 90-day revenue together',highlight:true},
+            {text:'<strong>Source Cohort:</strong> "All users from Meta Prospecting in April 2026 vs TikTok in April 2026" — compare LTV by acquisition channel'},
+            {text:'<strong>Campaign Cohort:</strong> "Users from Spring Sale creative vs Testimonial creative" — compare which creative brings higher-value users'},
+          ]
+        },
+        {
+          heading:'Key Cohort Metrics',
+          items:[
+            {text:'<strong>D1/D7/D30 Retention Rate:</strong> % of cohort still active on Day 1, 7, or 30 after install. Benchmarks: D1 ~30%, D7 ~15%, D30 ~8% (varies significantly by app category).',highlight:true},
+            {text:'<strong>ARPU (Average Revenue Per User):</strong> Total cohort revenue ÷ cohort size. Track this at D30, D60, D90 to build an LTV curve.'},
+            {text:'<strong>ARPPU (Average Revenue Per Paying User):</strong> Revenue ÷ number of users who actually paid. Separates payer quality from payer rate.',highlight:true},
+            {text:'<strong>Payer Rate:</strong> % of cohort that converted to any paying event. Low payer rate + high ARPPU = few high-value users. High payer rate + low ARPPU = broad but shallow monetization.'},
+            {text:'<strong>LTV (Lifetime Value):</strong> Projected total revenue from a cohort over their full lifetime. In practice, modeled from observed D30/D60/D90 curves.'},
+          ]
+        },
+        {
+          heading:'LTV/CPI Analysis: The Only Metric That Matters',
+          body:`CPI (Cost Per Install) is what most mobile marketers optimize on by default. But a low CPI from a low-quality source destroys returns. The right metric is LTV/CPI — the return on your acquisition investment.`,
+          code:`// LTV/CPI Analysis Example (GolfPass+)
+
+Channel         CPI      D90 LTV   LTV/CPI    Verdict
+──────────────────────────────────────────────────────
+Meta Prosp.    $4.50    $22.00     4.9x       ✅ Strong
+TikTok         $2.10    $6.50      3.1x       ⚠️ Marginal
+ASA Brand KW   $8.00    $45.00     5.6x       ✅ Best
+Google UAC     $3.80    $18.00     4.7x       ✅ Good
+Influencer     $1.20    $2.80      2.3x       ❌ Poor ROI
+
+→ Shift budget from Influencer/TikTok → ASA + Meta`,
+          tip:{label:'💡 Key Insight',text:'In this example, ASA Brand Keywords has the highest CPI but the best LTV/CPI ratio. Brand keyword users are high-intent — they\'re searching for GolfPass by name. They subscribe at higher rates and stay longer. Don\'t cut high-CPI channels without first checking their LTV.'}
+        },
+        {
+          heading:'Running Cohort Reports in Kochava',
+          items:[
+            {text:'<strong>Path:</strong> Dashboard → Reports → Cohort Report',highlight:true},
+            {text:'<strong>Group by:</strong> Network, Campaign, Creative, Country — mix and match to find insights'},
+            {text:'<strong>Time range:</strong> Select install date range for the cohort you want to analyze'},
+            {text:'<strong>Metrics:</strong> Select Revenue, Events, Retention — can run multiple in one report',highlight:true},
+            {text:'<strong>Export:</strong> Export to CSV/Excel for deeper analysis or Datarama dashboard connection'},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'Meta brings installs at $4.50 CPI with D90 LTV of $22. TikTok brings installs at $2.10 CPI with D90 LTV of $6.50. If you have a limited budget, which channel deserves more investment?',
+          options:['TikTok — lower CPI means better efficiency','Meta — 4.9x LTV/CPI ratio vs TikTok\'s 3.1x. Meta returns $4.89 for every dollar spent vs TikTok\'s $3.10. Meta\'s higher CPI is justified by much higher user quality.','They\'re equivalent — different metrics favor each','Need more data before deciding'],
+          correct:1,
+          explanation:'Correct! LTV/CPI is the correct framework: Meta = $22/$4.50 = 4.9x return. TikTok = $6.50/$2.10 = 3.1x return. Every dollar shifted from TikTok to Meta generates ~58% more return. CPI is a cost metric, not a value metric — always pair it with LTV before making budget decisions.'
+        },
+        {
+          question:'A cohort of 1,000 users installed GolfPass in January. By D30: 200 are still active, 80 have subscribed, total revenue is $7,920. What is the D30 ARPU and payer rate?',
+          options:['ARPU: $79.20, Payer rate: 20%','ARPU: $7.92, Payer rate: 8%','ARPU: $99.00, Payer rate: 8%','ARPU: $39.60, Payer rate: 8%'],
+          correct:1,
+          explanation:'Correct! ARPU = Total Revenue / Total Cohort Size = $7,920 / 1,000 = $7.92. Payer Rate = Subscribers / Total Cohort = 80 / 1,000 = 8%. Note: ARPPU would be $7,920 / 80 = $99 (price of one subscription). These three metrics together tell a complete story about this cohort.'
+        },
+        {
+          question:'You run cohort reports and find that users from "Tutorial Complete" events have 3x higher D30 LTV than users who didn\'t complete onboarding. What is the strategic implication for your campaigns?',
+          options:['Improve the tutorial — this is a product problem, not a marketing problem','Create a custom audience of app users who completed the tutorial and use it for lookalike targeting to Meta/TikTok — you\'re finding the profile of high-LTV users and asking the network to find more like them','Optimize ads for Tutorial Complete as a conversion event instead of Subscribe','All of the above are valid strategies — this insight should inform both product and marketing decisions'],
+          correct:3,
+          explanation:'Correct! This is a multi-use insight. 1) Marketing: build Tutorial Complete lookalike audiences for Meta/TikTok — users similar to your highest-LTV profile. 2) Optimization: consider using Tutorial Complete as a mid-funnel optimization event for networks with low subscribe volume. 3) Product: surface this data to the product team — onboarding improvement could be your highest-leverage growth lever.'
+        }
+      ]
+    }
+  },
+  {
+    id:11, level:'advanced', icon:'🔒', iconClass:'icon-red',
+    title:'Privacy, Compliance & the Cookieless Future',
+    desc:'ATT, GDPR, CCPA, SKAN 4.0, Android Privacy Sandbox — navigating the privacy-first landscape.',
+    lessons:12, mins:30,
+    content:{
+      overview:`Privacy regulations and platform policies have reshaped mobile measurement more dramatically than any other single force. ATT killed ~60–70% of iOS IDFA availability overnight. GDPR and CCPA impose legal obligations on data collection. Android's Privacy Sandbox is coming. If you're not fluent in the privacy landscape, you're flying blind on a significant portion of your audience.`,
+      sections:[
+        {
+          heading:'Key Privacy Frameworks',
+          items:[
+            {text:'<strong>ATT (App Tracking Transparency) — Apple:</strong> Required since iOS 14.5 (April 2021). Apps must show a system prompt before accessing IDFA. Non-compliance = App Store rejection. Opt-in rates: 25–45% depending on app category.',highlight:true},
+            {text:'<strong>GDPR — EU:</strong> Applies to any user in the EU regardless of company location. Requires lawful basis for processing personal data (consent, legitimate interest, contract). Fines up to 4% of global annual revenue.'},
+            {text:'<strong>CCPA/CPRA — California:</strong> Opt-out of "sale" or "sharing" of personal data. "Do Not Sell or Share My Personal Information" must be accessible. CPRA (2023) expanded rights.',highlight:true},
+            {text:'<strong>COPPA (USA):</strong> No advertising tracking for users under 13. Critical for gaming apps. Kochava\'s COPPA mode disables tracking for child-directed apps.'},
+            {text:'<strong>Android Privacy Sandbox:</strong> Google\'s gradual deprecation of GAID. Topics API, Protected Audience API, and Attribution Reporting API are planned replacements. Timeline: 2025–2027.'},
+          ]
+        },
+        {
+          heading:'ATT Optimization Strategies',
+          body:`ATT opt-in rate significantly impacts your iOS attribution quality. Higher opt-in = more IDFA availability = better deterministic matching. This is worth investing in.`,
+          items:[
+            {text:'<strong>Pre-prompt strategy:</strong> Show your own custom screen BEFORE the system ATT prompt, explaining why tracking benefits the user. This is the single most effective lever.',highlight:true},
+            {text:'<strong>Timing:</strong> Show the ATT prompt after the user has experienced value — not on first launch. Research shows opt-in rates are 15–20% higher when users understand the benefit first.'},
+            {text:'<strong>Copy examples:</strong> "Allow tracking helps us show you relevant golf courses near you instead of random ads." Concrete, specific, benefit-oriented.'},
+            {text:'<strong>Avoid dark patterns:</strong> Apple will reject apps that use manipulative copy or design to pressure opt-in. Keep it honest.',highlight:true},
+          ]
+        },
+        {
+          heading:'SKAN 4.0 Deep Dive',
+          body:`SKAdNetwork 4.0 (iOS 16.1+) is Apple\'s evolved privacy-preserving attribution framework. Understanding it is essential because a growing percentage of iOS attribution runs through SKAN.`,
+          items:[
+            {text:'<strong>3 Postback Windows:</strong> Window 1: 0–2 days (fine-grained conversion value available). Window 2: 3–7 days (coarse value: low/medium/high). Window 3: 8–35 days (coarse value).',highlight:true},
+            {text:'<strong>Crowd Anonymity Threshold:</strong> Apple only sends SKAN postbacks when enough users match (preventing individual re-identification). Low-volume campaigns may not receive postbacks.'},
+            {text:'<strong>Web-to-App:</strong> SKAN 4.0 supports attribution for users who clicked a web ad and installed the app — previously unmeasurable in SKAN.'},
+            {text:'<strong>Coarse vs Fine values:</strong> Fine-grained (0–63) only in Window 1. Windows 2 and 3 use coarse values (low/medium/high). Map your conversion values accordingly — put your most important early events in Window 1.',highlight:true},
+          ]
+        },
+        {
+          heading:'Maintaining Measurement Quality in a Privacy-First World',
+          items:[
+            {text:'<strong>Modeled conversions:</strong> Meta, Google use ML to model conversions for users who opted out of tracking. Factor this into your expected discrepancy with Kochava.',highlight:true},
+            {text:'<strong>Aggregated reporting:</strong> Shift from user-level analysis to cohort-level and segment-level analysis. Privacy regulations make granular user-level reporting increasingly difficult.'},
+            {text:'<strong>First-party data strategy:</strong> Email match rates, customer lists, first-party audiences become more valuable as device IDs disappear. Build your CRM → ad platform connections now.',highlight:true},
+            {text:'<strong>Privacy-by-design:</strong> Collect only what you need, retention limits, proper consent management — not just for compliance but for user trust.'},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'You\'re launching GolfPass+ in Germany. Beyond ATT (which is iOS-specific), what additional legal requirement affects how you configure Kochava for EU users?',
+          options:['No additional requirements — ATT covers everything','GDPR requires a lawful basis for processing personal data. You must implement a consent management platform (CMP) and only activate Kochava tracking for users who consent. Operating without consent for EU users carries fines up to 4% of global revenue.','CCPA applies in Germany as well','EU users must be excluded from all tracking'],
+          correct:1,
+          explanation:'Correct! GDPR applies to all users in the EU. For mobile apps, this typically means implementing a consent management platform (CMP) that gives users the choice to accept or decline tracking before Kochava begins collecting data. Kochava supports consent-aware initialization — the SDK can be configured to only activate after consent is granted. This is separate from and in addition to ATT on iOS.'
+        },
+        {
+          question:'SKAN 4.0 has three postback windows. You\'re setting up conversion values for GolfPass+. Which event should you prioritize mapping in Window 1 (0–2 days) vs Window 3 (8–35 days)?',
+          options:['Put long-term events in Window 1 since it\'s the first postback','Window 1 (fine-grained): early funnel events like Registration and Tutorial Complete. Window 3 (coarse): subscription and revenue events which take more time to occur — using coarse values for longer-horizon events is acceptable since you need population volume anyway','All windows should map to the same events','SKAN conversion values are the same across all three windows'],
+          correct:1,
+          explanation:'Correct! Window 1 (0–2 days) uses fine-grained values (0–63) and captures early post-install activity. Map your quick-firing events here: Registration, Tutorial Complete, first content view. Window 3 (8–35 days) uses coarse values (low/medium/high) — sufficient for categorizing users by revenue tier (non-payer, trial, subscriber). Map your revenue events here since subscriptions often take days to weeks to convert.'
+        },
+        {
+          question:'Your iOS campaign metrics look much weaker in Kochava than in Meta\'s Ads Manager. You\'ve confirmed the integration is correct. What is the most likely explanation?',
+          options:['Kochava is miscalculating iOS installs','Meta uses modeled/statistical conversions for ATT opt-out users (representing ~60–70% of iOS users) and counts these in its reported numbers. Kochava only attributes installs it can match via IDFA or probabilistic signals. The gap is structural and expected — not a bug.','The SKAN integration is broken','Meta is reporting web conversions mixed with app installs'],
+          correct:1,
+          explanation:'Correct! This is the most commonly misunderstood discrepancy in mobile measurement. Meta\'s iOS numbers include statistically modeled conversions for users who declined ATT. Kochava\'s numbers include only installs it can attribute with sufficient confidence. For budget decisions, use Kochava — it\'s the conservative, verifiable number. Meta\'s higher numbers reflect its modeled view, which can\'t be independently verified.'
+        }
+      ]
+    }
+  },
+
+  // ══════════════════════════════
+  //  EXPERT
+  // ══════════════════════════════
+  {
+    id:12, level:'expert', icon:'🧪', iconClass:'icon-blue',
+    title:'Incrementality Testing & Media Mix Modeling',
+    desc:'Beyond attribution — proving actual lift with geo holdout tests and MMM.',
+    lessons:15, mins:42,
+    content:{
+      overview:`Attribution answers "who got credit?" Incrementality answers "what actually caused the conversion?" This distinction is worth tens of millions of dollars for large advertisers. Research consistently shows that 30–60% of attributed conversions are not incremental — the user would have converted anyway without seeing the ad. This module teaches you how to prove (or disprove) the real value of your channels using Kochava's incrementality tools and Media Mix Modeling.`,
+      sections:[
+        {
+          heading:'Attribution vs. Incrementality: The Core Distinction',
+          body:`Imagine 100 users who install GolfPass+ after seeing a Meta ad. Attribution credits Meta with all 100. But some of those users were going to install anyway — they were already searching for GolfPass, had seen it before, or heard about it from a friend. Incrementality measures how many of those 100 installs were CAUSED by the Meta ad.`,
+          items:[
+            {text:'<strong>Attributed installs:</strong> All installs where a Meta ad touchpoint exists in the attribution window (e.g., last 7 days)',highlight:true},
+            {text:'<strong>Incremental installs:</strong> Only the installs that would NOT have occurred without seeing the Meta ad'},
+            {text:'<strong>Incrementality rate:</strong> (Incremental installs ÷ Attributed installs) × 100. Industry average for mature brands: 35–65%.',highlight:true},
+            {text:'<strong>True ROAS:</strong> Revenue from incremental users ÷ spend. This is always lower than attributed ROAS.'},
+          ],
+          tip:{label:'🎯 Industry Reality',text:'A study by Facebook itself found that 70% of app install campaigns showed significant incrementality — meaning 30% of attributed installs were not incremental. For retargeting campaigns, the non-incremental rate is often even higher (40–60%) because you\'re retargeting high-intent users who might have converted organically.'}
+        },
+        {
+          heading:'Geo Holdout Tests: The Gold Standard',
+          body:`A geo holdout test is the most statistically rigorous incrementality methodology available to digital marketers. You run ads in "test" markets and withhold them from matched "control" markets, then compare conversion rates.`,
+          items:[
+            {text:'<strong>Step 1: Market selection:</strong> Identify pairs of markets (DMAs, states, countries) that are as similar as possible in demographics, GolfPass usage, and seasonality',highlight:true},
+            {text:'<strong>Step 2: Baseline period:</strong> Run both markets without ads for 2 weeks to establish baseline conversion rates. They should be close.'},
+            {text:'<strong>Step 3: Test period:</strong> Run ads in test markets, continue withholding in control markets. Run for 2–4 weeks minimum.'},
+            {text:'<strong>Step 4: Measure lift:</strong> Compare conversion rates: (Test rate - Control rate) ÷ Control rate = Incrementality lift',highlight:true},
+            {text:'<strong>Step 5: Scale decision:</strong> If lift is statistically significant and the incremental CPA is within target, scale the channel.'},
+          ]
+        },
+        {
+          heading:'Kochava\'s Incrementality Tools',
+          items:[
+            {text:'<strong>Kochava iROAS:</strong> Kochava\'s built-in incrementality measurement product. Integrates with your existing attribution data to estimate incremental lift by channel.',highlight:true},
+            {text:'<strong>Lift Studies:</strong> Kochava supports configuring lift study parameters and measuring results through the dashboard.'},
+            {text:'<strong>Holdout Configuration:</strong> Kochava can be configured to suppress postbacks (and therefore ad delivery) in holdout regions for geo tests.'},
+          ]
+        },
+        {
+          heading:'Media Mix Modeling (MMM)',
+          body:`MMM is a statistical approach that models the relationship between marketing spend across all channels and business outcomes (revenue, installs, subscriptions), using historical data. Unlike attribution, it doesn't require user-level tracking — making it the most privacy-resilient measurement methodology.`,
+          code:`MMM Inputs:
+  Weekly_Spend:    Meta, Google, TikTok, ASA, TV, OOH, Email
+  Revenue:         Weekly GolfPass+ subscription revenue
+  External:        PGA Tour calendar, weather, holidays, competitor activity
+  Organic:         App Store browse/search baseline
+
+MMM Outputs:
+  Channel Contribution:   % of revenue attributable to each channel
+  Diminishing Returns:    Budget curves showing ROI at different spend levels
+  Optimal Allocation:     Recommended budget split to maximize revenue`,
+          items:[
+            {text:'<strong>Best for:</strong> Brand-level budget allocation, channels that are hard to attribute (TV, podcast, OOH), privacy-safe upper funnel measurement',highlight:true},
+            {text:'<strong>Limitations:</strong> Requires 1–2 years of weekly historical data. Slow to update. Not useful for campaign-level optimization.'},
+            {text:'<strong>Paired with attribution:</strong> Use MMM for strategic budget allocation + Kochava attribution for campaign-level optimization. They\'re complementary, not competing.',highlight:true},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'A geo holdout test for Meta shows: Test markets (ads running) had a 3.2% subscription rate. Control markets (no ads) had a 2.6% subscription rate. What is the incrementality lift?',
+          options:['3.2% lift','23.1% incremental lift: (3.2 - 2.6) / 2.6 = 0.23 = 23.1%','0.6% lift','Meta is responsible for all 3.2% of subscriptions in test markets'],
+          correct:1,
+          explanation:'Correct! Incrementality lift = (Test rate - Control rate) / Control rate = (3.2 - 2.6) / 2.6 = 0.6 / 2.6 = 23.1%. Meta ads drove a 23.1% lift in subscription rate above the baseline. This means ~77% of Meta\'s attributed subscriptions might have happened anyway — the ad is driving real but not total lift. This is valuable for budget decision-making: is your incremental CPA within target?'
+        },
+        {
+          question:'You run incrementality tests and find your retargeting campaign has only 15% incrementality (85% of attributed conversions are non-incremental). What should you do?',
+          options:['Nothing — attributed ROAS is still positive so the campaign is working','Significantly reduce or restructure retargeting spend. You\'re paying for conversions that would have happened organically. Consider tighter audience exclusions, shorter retargeting windows, or moving budget to prospecting where incrementality is typically higher.','Turn off all retargeting campaigns immediately','The test is wrong — retargeting always has high incrementality'],
+          correct:1,
+          explanation:'Correct! 15% incrementality is very low — you\'re paying for 85% of conversions that would have happened without your ads. This is "harvesting" intent rather than creating it. Strategic responses: 1) Tighten retargeting windows (7 days instead of 30), 2) Exclude users already in-app registration flow, 3) Test removing retargeting budget entirely and observe organic conversion rate change. Shift recaptured budget to high-incrementality prospecting.'
+        },
+        {
+          question:'Why is Media Mix Modeling (MMM) becoming more valuable as mobile tracking restrictions increase?',
+          options:['MMM is only valuable for TV and offline channels','MMM doesn\'t require user-level tracking data — it uses aggregated spend/revenue data. As IDFA and GAID availability declines, deterministic attribution covers a smaller percentage of conversions. MMM fills the gap by modeling channel contribution without relying on individual tracking.','MMM replaces attribution platforms like Kochava entirely','MMM only works for brands spending over $100M'],
+          correct:1,
+          explanation:'Correct! MMM\'s core advantage is that it\'s privacy-agnostic — it works on aggregated weekly data without any user identifiers. As ATT reduces iOS IDFA availability, as Android deprecates GAID, and as GDPR expands across markets, the percentage of conversions attributable through deterministic means shrinks. MMM provides a complementary top-down view of channel contribution that doesn\'t depend on tracking infrastructure at all.'
+        }
+      ]
+    }
+  },
+  {
+    id:13, level:'expert', icon:'🚀', iconClass:'icon-blue',
+    title:'Advanced Kochava: Audiences, S2S & Full-Stack Strategy',
+    desc:'Suppression audiences, server-to-server integrations, and building a measurement strategy that scales.',
+    lessons:16, mins:45,
+    content:{
+      overview:`This final module covers the advanced Kochava capabilities that separate good mobile marketers from exceptional ones. Audience management eliminates wasted spend. S2S integration captures revenue events your SDK can't reach. And a well-designed full-stack measurement strategy combines attribution, cohort analysis, incrementality, and MMM into a single operational framework.`,
+      sections:[
+        {
+          heading:'Audience Segments: Your First-Party Data Advantage',
+          body:`Kochava can build dynamic audience segments from your in-app event data and automatically sync them to your ad networks. As third-party data erodes, your first-party app audience data becomes one of your most valuable assets.`,
+          items:[
+            {text:'<strong>Suppression Audiences:</strong> Push existing GolfPass+ subscribers to Meta/Google/TikTok as exclusion audiences — stop paying to acquire users you already have. This alone can reduce wasted spend by 5–15%.',highlight:true},
+            {text:'<strong>Re-engagement Audiences:</strong> Users who installed but never subscribed (30+ days ago) — high-intent, already familiar with the brand. Much cheaper to convert via retargeting than cold prospecting.'},
+            {text:'<strong>LTV-Based Lookalikes:</strong> Sync your top 10% LTV users to Meta/TikTok as a seed audience for Lookalike Audiences. These lookalikes acquire users who resemble your highest-value existing customers.',highlight:true},
+            {text:'<strong>Custom Event Audiences:</strong> "Users who completed Tutorial but haven\'t subscribed" — specific behavioral targets for highly personalized ad creative.'},
+            {text:'<strong>Sync Frequency:</strong> Set to daily for suppression lists. High-volume apps may benefit from real-time sync via S2S audience updates.',highlight:true},
+          ]
+        },
+        {
+          heading:'Server-to-Server (S2S) Integration',
+          body:`S2S integration sends event data directly from your backend servers to Kochava, bypassing the SDK entirely. It's more reliable than SDK calls, doesn't require app updates, and captures events that never happen inside the app (like subscription renewals processed by Apple's billing system).`,
+          code:`// S2S Event POST to Kochava
+POST https://sdk-traffic.kochava.com/track/event
+Authorization: your_api_key
+
+{
+  "kochava_app_id":    "koapp-ios-abc123",
+  "kochava_device_id": "A1B2C3D4-...",
+  "event_name":        "Renewal",
+  "event_data": {
+    "product_id":      "golfpass_plus_annual",
+    "price":           99.00,
+    "currency":        "USD",
+    "renewal_number":  2,
+    "original_purchase_date": "2025-04-21"
+  },
+  "timestamp": "2026-04-21T19:00:00Z"
+}`,
+          items:[
+            {text:'<strong>Primary use case for GolfPass:</strong> Annual subscription renewals — these are processed by Apple/Google billing servers, not inside the app. SDK never fires. S2S is the only way to capture this revenue in Kochava.',highlight:true},
+            {text:'<strong>Other S2S use cases:</strong> Web checkout that leads to app use, backend fraud refunds/chargebacks, B2B billing events, server-processed promotional credits.'},
+            {text:'<strong>Identity resolution:</strong> S2S calls must include a device ID or Kochava device UUID to tie the event to the correct attribution record.',highlight:true},
+          ]
+        },
+        {
+          heading:'Kochava Collective: Privacy-Safe Audience Data',
+          body:`Kochava Collective is Kochava's data marketplace — an opt-in, privacy-compliant dataset of mobile user behaviors across the Kochava ecosystem. Use it to enrich your audience targeting without relying on third-party data that may violate privacy regulations.`,
+          items:[
+            {text:'<strong>Audience enrichment:</strong> Append behavioral signals (sports app usage, outdoor activity interest, premium subscription behavior) to your first-party user data',highlight:true},
+            {text:'<strong>Competitive conquest:</strong> Target users who have used competitor golf apps in the past 90 days'},
+            {text:'<strong>Privacy compliance:</strong> All Collective data is opt-in and GDPR/CCPA compliant. No individual PII is exposed.',highlight:true},
+          ]
+        },
+        {
+          heading:'Full-Stack Measurement Strategy',
+          body:`The most sophisticated mobile marketing teams operate four measurement layers simultaneously. Each answers a different question and informs different decisions.`,
+          items:[
+            {text:'<strong>Layer 1 — MMP Attribution (Kochava):</strong> Who gets credit for each install/event? Used for: daily/weekly campaign optimization, network budget reallocation, creative performance.',highlight:true},
+            {text:'<strong>Layer 2 — Cohort Analysis:</strong> Which channels bring the highest-LTV users? Used for: monthly channel investment decisions, creative quality assessment, LTV projection.'},
+            {text:'<strong>Layer 3 — Incrementality Testing:</strong> Which channels drive real causal lift? Used for: quarterly channel validation, retargeting spend efficiency, proving marketing ROI to finance.',highlight:true},
+            {text:'<strong>Layer 4 — Media Mix Modeling:</strong> What is each channel\'s portfolio-level contribution? Used for: annual budget planning, upper-funnel channel justification, privacy-safe measurement.'},
+          ]
+        },
+        {
+          heading:'Operating Cadence',
+          items:[
+            {text:'<strong>Daily:</strong> Monitor Kochava attribution dashboard — CPI trends, fraud alerts, postback health',highlight:true},
+            {text:'<strong>Weekly:</strong> Network ROAS review, creative performance, budget reallocation decisions'},
+            {text:'<strong>Monthly:</strong> Cohort LTV analysis, channel quality review, audience list refresh'},
+            {text:'<strong>Quarterly:</strong> Incrementality test results, channel investment decisions, budget reallocation',highlight:true},
+            {text:'<strong>Annually:</strong> MMM refresh, full attribution model review, measurement strategy update'},
+          ]
+        }
+      ],
+      quizzes:[
+        {
+          question:'GolfPass+ has 50,000 active subscribers. You haven\'t set up suppression audiences in Meta. What is the most likely waste this creates?',
+          options:['No waste — subscribers don\'t see app install ads','Meta is showing acquisition ads (paying ~$4.50 CPI) to existing subscribers who will never install again because they already have the app. Setting up a suppression audience stops wasting budget on already-converted users.','Meta automatically excludes existing app users','Suppression only matters for retargeting campaigns'],
+          correct:1,
+          explanation:'Correct! Without suppression audiences, Meta\'s broad targeting will inevitably reach existing GolfPass+ subscribers and show them acquisition ads — you pay for impressions and potentially clicks from users you already have. Syncing your subscriber list as a Meta exclusion audience is free, takes 30 minutes to set up, and immediately improves acquisition efficiency by removing existing customers from prospecting pools.'
+        },
+        {
+          question:'A GolfPass+ user subscribes in-app on April 1. Their annual subscription renews on April 1 of the following year via Apple\'s billing system. The Kochava SDK is not running when this renewal occurs. How do you capture this $99 renewal revenue in Kochava?',
+          options:['You can\'t — Kochava only tracks SDK events','Server-to-Server (S2S) integration: when Apple\'s billing system processes the renewal, your backend receives a webhook. Your server then posts the Renewal event to Kochava\'s S2S endpoint with the user\'s device ID and $99 revenue.','Enable renewal tracking in the Kochava dashboard settings','The SDK tracks renewals automatically via StoreKit'],
+          correct:1,
+          explanation:'Correct! Apple processes subscription renewals on their servers with no app involvement — the SDK never fires. To capture this for LTV modeling, your backend must: 1) receive Apple\'s server-to-server notification for the renewal, 2) look up the user\'s Kochava device ID from your database, 3) POST a Renewal event to Kochava\'s S2S endpoint with the $99 revenue. This is critical for accurate LTV calculations on subscription apps.'
+        },
+        {
+          question:'Your team wants to justify a $500K annual media budget to the CFO. You have strong Kochava attributed ROAS numbers. The CFO asks "would those users have subscribed anyway without the ads?" What measurement methodology do you use to answer this?',
+          options:['Show Kochava\'s last-click attribution data — that proves the ads worked','Run geo holdout incrementality tests to measure causal lift. Kochava attribution shows who got credit; incrementality tests prove whether the ads actually caused the conversions. The CFO\'s question is an incrementality question that attribution alone cannot answer.','Use Meta\'s own ROAS reporting as proof','Cohort analysis shows user LTV which proves value'],
+          correct:1,
+          explanation:'Correct! Attribution data cannot answer the question "would they have converted anyway?" — it only shows that a touchpoint existed before conversion. Incrementality testing (geo holdout) provides causal evidence by comparing conversion rates in markets with vs without ads. This is the only methodology that can definitively answer a CFO\'s incrementality question and justify budget based on proven causal lift.'
+        }
+      ]
+    }
+  }
+];
+
+const GLOSSARY = [
+  {term:'MMP',def:'Mobile Measurement Partner — neutral third-party attribution platform (Kochava, AppsFlyer, Adjust). Provides single source of truth across all ad networks.'},
+  {term:'IDFA',def:'Identifier for Advertisers — Apple\'s advertising ID for iOS. Requires ATT opt-in since iOS 14.5. The gold standard for iOS attribution when available.'},
+  {term:'GAID',def:'Google Advertising ID — Android\'s equivalent of IDFA. Still broadly available without a permission prompt. Used for deterministic attribution on Android.'},
+  {term:'ATT',def:'App Tracking Transparency — Apple\'s framework (iOS 14.5+) requiring user consent before accessing IDFA. Industry opt-in: 25–45%.'},
+  {term:'SKAdNetwork (SKAN)',def:'Apple\'s privacy-preserving attribution framework. Reports aggregated install data to ad networks without user-level IDs. SKAN 4.0 adds 3 postback windows.'},
+  {term:'Postback',def:'Server-to-server signal from Kochava to an ad network confirming a tracked install or in-app event. The mechanism that feeds network bidding algorithms.'},
+  {term:'Deferred Deep Link',def:'Deep link that works even when the app isn\'t installed. User is routed to correct in-app screen after installing via App Store.'},
+  {term:'CPI',def:'Cost Per Install — total spend divided by attributed installs. Useful as a cost metric but meaningless without LTV context.'},
+  {term:'LTV / CLTV',def:'Lifetime Value — total revenue expected from a user over their relationship with your app. The correct metric to pair with CPI.'},
+  {term:'Cohort',def:'Group of users who installed in the same time window, analyzed together to understand retention and revenue trends.'},
+  {term:'ProtectIQ',def:'Kochava\'s real-time fraud prevention suite. Analyzes CTIT, IP, device anomalies, and behavioral signals to flag/block fraudulent installs.'},
+  {term:'CTIT',def:'Click-to-Install Time — time between ad click and first app open. Normal range: 30 sec–7 days. <10 seconds = click injection fraud signal.'},
+  {term:'Click Injection',def:'Android fraud: malware detects an install download starting and fires a fake click to steal last-click attribution. Detectable via near-zero CTIT.'},
+  {term:'SDK Spoofing',def:'Fraud where attackers replay real SDK traffic to generate fake installs with no actual device or user. Detected via cryptographic signature validation.'},
+  {term:'Incrementality',def:'Measurement of true causal lift — conversions that would NOT have occurred without the ad. Measured via geo holdout tests.'},
+  {term:'MMM',def:'Media Mix Modeling — statistical model attributing revenue to channels using aggregated historical data. Privacy-safe, no user-level tracking required.'},
+  {term:'S2S',def:'Server-to-Server — event data sent from your backend directly to Kochava, bypassing SDK. Essential for capturing subscription renewals.'},
+  {term:'Tracker Link',def:'Kochava URL assigned to each campaign/network, equivalent to UTM-tagged URL for web. Must include device ID and click ID macros.'},
+  {term:'Conversion Value',def:'SKAN concept: 0–63 number encoding post-install activity, sent to ad networks. You define the mapping; Kochava decodes it.'},
+  {term:'ARPU',def:'Average Revenue Per User — total cohort revenue divided by total users. The core LTV-building metric.'},
+  {term:'Suppression Audience',def:'List of existing customers pushed to ad networks as exclusion audiences — prevents wasting acquisition budget on already-converted users.'},
+  {term:'AEM',def:'Aggregated Event Measurement — Meta\'s iOS measurement framework post-ATT. Limits to 8 conversion events per app. Kochava events must map to AEM event list.'},
+  {term:'SmartLink',def:'Single Kochava URL that routes users based on device (iOS/Android) and app install status. Use for email, SMS, social where device is unknown.'},
+  {term:'IDFV',def:'Identifier for Vendor — iOS ID shared across all apps from same developer on one device. Not available to ad networks, but useful for internal cross-app analytics.'},
+];
+
+const CHEATSHEET_ITEMS = [
+  {label:'iOS Attribution Method',value:'IDFA (requires ATT opt-in)',note:'Fallback: SKAN + probabilistic matching'},
+  {label:'Android Attribution',value:'GAID (Google Advertising ID)',note:'Fallback: probabilistic if user opts out'},
+  {label:'Fraud CTIT Range',value:'10 seconds → 7 days',note:'Outside this window = likely fraudulent install'},
+  {label:'ATT Industry Opt-In',value:'25–45%',note:'Lower for games (~25%), higher for utilities (~45%)'},
+  {label:'SKAN 4.0 Windows',value:'0–2d / 3–7d / 8–35d',note:'Window 1: fine values. Windows 2–3: coarse (low/med/high)'},
+  {label:'Postback Setting',value:'All Installs (not matched-only)',note:'Matched-only starves network ML bidding models'},
+  {label:'Revenue Forwarding',value:'Always enable on revenue events',note:'Required for tROAS/VBO bidding on all platforms'},
+  {label:'GolfPass Key Event',value:'Subscribe @ $99 USD',note:'Primary ROAS optimization event'},
+  {label:'Good LTV/CPI Ratio',value:'> 3x (subscription apps)',note:'Below 2x: channel likely unprofitable'},
+  {label:'Tracker Naming',value:'[Platform]_[OS]_[Type]_[Audience]_[Creative]',note:'Enforce before first launch — hard to fix later'},
+  {label:'Audience Sync Frequency',value:'Daily for suppression lists',note:'Stale lists waste budget on existing subscribers'},
+  {label:'S2S Primary Use Case',value:'Subscription renewals',note:'SDK never fires for Apple/Google billing events'},
+  {label:'Incrementality Test Duration',value:'2–4 weeks minimum',note:'Shorter = insufficient statistical significance'},
+  {label:'Industry Avg Incrementality',value:'35–65% (prospecting)',note:'Retargeting often 15–40% — validate before scaling'},
+  {label:'Cohort Analysis Cadence',value:'Monthly LTV review',note:'Minimum D30, ideally D60/D90 for subscription apps'},
+];
+
+// ─── STATE ───
+function getProgress(){ try{return JSON.parse(localStorage.getItem('kochava_progress')||'{}')}catch{return{}} }
+function saveProgress(p){ localStorage.setItem('kochava_progress',JSON.stringify(p)) }
+function isCompleted(id){ return !!getProgress()[id] }
+function markComplete(id){ const p=getProgress(); p[id]=true; saveProgress(p) }
+function resetProgress(){ if(confirm('Reset all progress?')){ localStorage.removeItem('kochava_progress'); location.reload() } }
+
+// ─── RENDER ───
+function renderModules(){
+  const grids={beginner:'grid-beginner',intermediate:'grid-intermediate',advanced:'grid-advanced',expert:'grid-expert'};
+  MODULES.forEach(m=>{
+    const done=isCompleted(m.id);
+    const card=document.createElement('div');
+    card.className='module-card'+(done?' completed':'');
+    card.innerHTML=`
+      <div class="module-card-header">
+        <div class="module-icon ${m.iconClass}">${m.icon}</div>
+        <div class="module-meta">
+          <h4>${m.id}. ${m.title}</h4>
+          <p>${m.desc}</p>
+        </div>
+      </div>
+      <div class="module-footer">
+        <div class="module-stats">
+          <span class="module-stat">📖 <strong>${m.lessons}</strong> concepts</span>
+          <span class="module-stat">⏱ <strong>${m.mins} min</strong></span>
+        </div>
+        <span class="module-action ${done?'done':''}">
+          ${done?'✅ Completed':'Start →'}
+        </span>
+      </div>`;
+    card.onclick=()=>openModule(m);
+    document.getElementById(grids[m.level]).appendChild(card);
+  });
+  updateProgress();
+}
+
+function renderGlossary(){
+  const g=document.getElementById('glossary');
+  GLOSSARY.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='glossary-item';
+    div.innerHTML=`<div class="glossary-term">${item.term}</div><div class="glossary-def">${item.def}</div>`;
+    g.appendChild(div);
+  });
+}
+
+function renderCheatsheet(){
+  const c=document.getElementById('cheatsheet');
+  CHEATSHEET_ITEMS.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='cheat-item';
+    div.innerHTML=`<div class="cheat-label">${item.label}</div><div class="cheat-value">${item.value}</div><div class="cheat-note">${item.note}</div>`;
+    c.appendChild(div);
+  });
+}
+
+function updateProgress(){
+  const total=MODULES.length;
+  const done=MODULES.filter(m=>isCompleted(m.id)).length;
+  const pct=Math.round((done/total)*100);
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('hdr-done').textContent=done;
+  document.getElementById('hdr-total').textContent=total;
+  const levels=['beginner','intermediate','advanced','expert'];
+  const levelNames=['Beginner','Intermediate','Advanced','Expert'];
+  let currentLevel='Beginner';
+  levels.forEach((lvl,i)=>{
+    const lvlMods=MODULES.filter(m=>m.level===lvl);
+    const lvlDone=lvlMods.filter(m=>isCompleted(m.id)).length;
+    const badge=document.getElementById('badge-'+lvl);
+    if(lvlDone===lvlMods.length){ badge.className='level-badge done'; currentLevel=levelNames[Math.min(i+1,3)]; }
+    else if(lvlDone>0){ badge.className='level-badge active'; currentLevel=levelNames[i]; }
+    else{ badge.className=i===0?'level-badge active':'level-badge locked'; }
+  });
+  document.getElementById('hdr-level').textContent=currentLevel;
+}
+
+// ─── MODAL ───
+let currentModule=null;
+let currentQuizIdx=0;
+let quizAnswered=false;
+let quizScore=0;
+
+function openModule(m){
+  currentModule=m; currentQuizIdx=0; quizAnswered=false; quizScore=0;
+  const done=isCompleted(m.id);
+  document.getElementById('modal-header').innerHTML=`
+    <div class="module-icon ${m.iconClass}" style="width:52px;height:52px;font-size:26px;border-radius:12px;">${m.icon}</div>
+    <div class="modal-header-text">
+      <h2>${m.id}. ${m.title}</h2>
+      <p>${m.desc} · ${m.lessons} concepts · ${m.mins} min · ${m.content.quizzes.length} quiz questions</p>
+    </div>`;
+
+  renderModalContent();
+  document.getElementById('modal-footer').innerHTML=`
+    <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+    <button class="btn ${done?'btn-secondary':'btn-complete'}" id="complete-btn" onclick="completeModule()" ${done?'disabled':''}>
+      ${done?'✅ Completed':'Mark Complete'}
+    </button>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function renderModalContent(){
+  const m=currentModule; const c=m.content;
+  let html=`<div class="lesson-section"><p>${c.overview}</p></div>`;
+  c.sections.forEach(sec=>{
+    html+=`<div class="lesson-section"><h3>${sec.heading}</h3>`;
+    if(sec.body) html+=`<p>${sec.body}</p>`;
+    if(sec.items){
+      html+=`<ul class="concept-list">`;
+      sec.items.forEach(item=>{ html+=`<li class="${item.highlight?'highlight':''}">${item.text}</li>`; });
+      html+=`</ul>`;
+    }
+    if(sec.code) html+=`<div class="code-block">${sec.code}</div>`;
+    if(sec.tip) html+=`<div class="tip-box"><div class="tip-label">${sec.tip.label}</div>${sec.tip.text}</div>`;
+    if(sec.warning) html+=`<div class="warning-box"><div class="warn-label">${sec.warning.label}</div>${sec.warning.text}</div>`;
+    html+=`</div>`;
+  });
+
+  // Quiz section
+  const quizzes=c.quizzes;
+  const q=quizzes[currentQuizIdx];
+  html+=`<div class="quiz-section">
+    <h3>✏️ Knowledge Check</h3>
+    <div class="quiz-progress">Question <span>${currentQuizIdx+1}</span> of <span>${quizzes.length}</span></div>
+    <div class="quiz-score ${currentQuizIdx===quizzes.length&&quizScore>=0?'':''}${currentQuizIdx>=quizzes.length?'show':''}" id="quiz-final-score">
+      <div class="quiz-score-num" id="final-score-num"></div>
+      <div class="quiz-score-label" id="final-score-label"></div>
+    </div>
+    <div id="quiz-question-block">
+      <div class="quiz-question">${q.question}</div>
+      <div class="quiz-options" id="quiz-opts">`;
+  q.options.forEach((opt,i)=>{ html+=`<button class="quiz-option" onclick="answerQuiz(${i})">${opt}</button>`; });
+  html+=`</div>
+      <div class="quiz-feedback" id="quiz-fb"></div>
+      <button class="btn btn-next" id="quiz-next" onclick="nextQuestion()" style="display:none;margin-top:8px;">Next Question →</button>
+    </div>
+  </div>`;
+
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('modal-body').scrollTop=0;
+}
+
+function answerQuiz(idx){
+  if(quizAnswered) return;
+  quizAnswered=true;
+  const q=currentModule.content.quizzes[currentQuizIdx];
+  const opts=document.querySelectorAll('.quiz-option');
+  const fb=document.getElementById('quiz-fb');
+  const nextBtn=document.getElementById('quiz-next');
+  opts.forEach((btn,i)=>{ btn.disabled=true; if(i===q.correct) btn.classList.add('correct'); else if(i===idx) btn.classList.add('wrong'); });
+  if(idx===q.correct) quizScore++;
+  fb.className='quiz-feedback show '+(idx===q.correct?'correct-fb':'wrong-fb');
+  fb.textContent=(idx===q.correct?'✅ ':'❌ ')+q.explanation;
+  const totalQ=currentModule.content.quizzes.length;
+  if(currentQuizIdx<totalQ-1){
+    nextBtn.style.display='inline-block';
+  } else {
+    // Show final score
+    setTimeout(()=>{
+      document.getElementById('quiz-question-block').style.display='none';
+      const scoreEl=document.getElementById('quiz-final-score');
+      scoreEl.classList.add('show');
+      document.getElementById('final-score-num').textContent=`${quizScore}/${totalQ}`;
+      const pct=Math.round((quizScore/totalQ)*100);
+      let msg='';
+      if(pct===100) msg='Perfect score! You nailed it. ✅';
+      else if(pct>=66) msg='Strong work — review the ones you missed. 💪';
+      else msg='Good effort — re-read the module and try again. 📖';
+      document.getElementById('final-score-label').textContent=msg;
+    },1200);
+  }
+}
+
+function nextQuestion(){
+  currentQuizIdx++;
+  quizAnswered=false;
+  renderModalContent();
+  document.getElementById('modal-body').scrollTop=document.getElementById('modal-body').scrollHeight;
+}
+
+function completeModule(){
+  if(!currentModule) return;
+  markComplete(currentModule.id);
+  const btn=document.getElementById('complete-btn');
+  btn.textContent='✅ Completed'; btn.disabled=true; btn.className='btn btn-secondary';
+  updateProgress();
+  const grids={beginner:'grid-beginner',intermediate:'grid-intermediate',advanced:'grid-advanced',expert:'grid-expert'};
+  const grid=document.getElementById(grids[currentModule.level]);
+  grid.querySelectorAll('.module-card').forEach(card=>{
+    const h4=card.querySelector('h4');
+    if(h4&&h4.textContent.startsWith(currentModule.id+'.')){
+      card.classList.add('completed');
+      const action=card.querySelector('.module-action');
+      action.textContent='✅ Completed'; action.classList.add('done');
+    }
+  });
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('open'); currentModule=null; }
+function closeModalOnOverlay(e){ if(e.target===document.getElementById('modal')) closeModal(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+renderModules();
+renderGlossary();
+renderCheatsheet();
+</script>
+</body>
+</html>
+            {text:'<strong>Layer 2 —
